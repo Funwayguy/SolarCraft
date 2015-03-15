@@ -2,6 +2,7 @@ package solarcraft.world;
 
 import java.util.List;
 import java.util.Random;
+import solarcraft.core.SC_Settings;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockFalling;
 import net.minecraft.block.material.Material;
@@ -143,8 +144,8 @@ public class ChunkProviderSpace implements IChunkProvider
             {
                 byte b0 = 1;
                 int i1 = -1;
-                Block block = Blocks.grass;
-                Block block1 = Blocks.dirt;
+                Block block = SC_Settings.genGrass? Blocks.grass : Blocks.stone;
+                Block block1 = SC_Settings.genGrass? Blocks.dirt : Blocks.stone;
 
                 for (int j1 = 127; j1 >= 0; --j1)
                 {
@@ -267,9 +268,9 @@ public class ChunkProviderSpace implements IChunkProvider
                 }
 
                 d3 = d3 * 3.0D - 2.0D;
-                float f = (float)(i2 + p_73187_2_ - 0) / 1.0F;
-                float f1 = (float)(j2 + p_73187_4_ - 0) / 1.0F;
-                float f2 = 100.0F - MathHelper.sqrt_float(f * f + f1 * f1) * 8.0F;
+                float f = (float)(i2 + p_73187_2_) / 1.0F;
+                float f1 = (float)(j2 + p_73187_4_) / 1.0F;
+                float f2 = MathHelper.clamp_float(100F - MathHelper.sqrt_float(f * f + f1 * f1) * 16.0F, SC_Settings.asteroidWeight, 100F);//Percentage of the island's density at this position
 
                 if (f2 > 80.0F)
                 {

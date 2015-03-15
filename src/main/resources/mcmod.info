@@ -1,15 +1,15 @@
 [
 {
-  "modid": "rouletteores",
-  "name": "RouletteOres",
-  "description": "Random chance of ores to do stuff when mined",
+  "modid": "solarcraft",
+  "name": "SolarCraft",
+  "description": "Roam through the remains of the Minecraft world scattered thoughout the solarsystem",
   "version": "${version}",
   "mcversion": "${mcversion}",
   "url": "",
   "updateUrl": "",
   "authorList": ["Funwayguy","Darkosto"],
   "credits": "",
-  "logoFile": "title.png",
+  "logoFile": "",
   "screenshots": [],
   "dependencies": []
 }

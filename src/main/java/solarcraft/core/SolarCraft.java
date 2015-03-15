@@ -27,7 +27,7 @@ public class SolarCraft
 {
     public static final String MODID = "solarcraft";
     public static final String VERSION = "SC_VER_KEY";
-    public static final String NAME = "RouletteOres";
+    public static final String NAME = "SolarCraft";
     public static final String PROXY = "solarcraft.core.proxies";
     public static final String CHANNEL = "SC_NET_CHAN";
 	

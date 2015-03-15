@@ -19,10 +19,10 @@ public class WorldGenSpaceStructure implements IWorldGenerator
 		int y = random.nextInt(192) + 32;
 		int z = chunkZ * 16;
 		
-		if(random.nextInt(100) == 0)
+		/*if(random.nextInt(100) == 0)
 		{
 			StructureBase structure = new StructureStation(world, x, y, z);
 			structure.Build();
-		}
+		}*/
 	}
 }

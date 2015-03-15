@@ -2,12 +2,12 @@ package solarcraft.handlers;
 
 import net.minecraftforge.common.config.Configuration;
 import org.apache.logging.log4j.Level;
+import solarcraft.core.SC_Settings;
 import solarcraft.core.SolarCraft;
 
 public class ConfigHandler
 {
 	public static Configuration config;
-	static String[] defComs;
 	
 	public static void initConfigs()
 	{
@@ -18,6 +18,9 @@ public class ConfigHandler
 		}
 		
 		config.load();
+		
+		SC_Settings.asteroidWeight = config.getFloat("Asteroid Weight", Configuration.CATEGORY_GENERAL, -30, -100F, 100F, "Weighted density of asteroids/landmasses");
+		SC_Settings.genGrass = config.getBoolean("Generate Grass", Configuration.CATEGORY_GENERAL, false, "Whether the world should generate with a grassy top");
 		
 		config.save();
 		
