@@ -19,8 +19,11 @@ public class ConfigHandler
 		
 		config.load();
 		
-		SC_Settings.asteroidWeight = config.getFloat("Asteroid Weight", Configuration.CATEGORY_GENERAL, -30, -100F, 100F, "Weighted density of asteroids/landmasses");
-		SC_Settings.genGrass = config.getBoolean("Generate Grass", Configuration.CATEGORY_GENERAL, false, "Whether the world should generate with a grassy top");
+		config.renameProperty(Configuration.CATEGORY_GENERAL, "Generate Grass", "Use Old Biomes");
+		
+		SC_Settings.asteroidWeight = config.getFloat("Asteroid Weight", Configuration.CATEGORY_GENERAL, -35, -100F, 100F, "Weighted density of asteroids/landmasses");
+		SC_Settings.genGrass = config.getBoolean("Use Old Biomes", Configuration.CATEGORY_GENERAL, false, "Use the overworlds old biomes instead. Makes for a good 'blown apart world' look");
+		SC_Settings.asteroidSize = config.getInt("Asteroid Size", Configuration.CATEGORY_GENERAL, 64, 16, 64, "Maximum size of an asteroid");
 		
 		config.save();
 		

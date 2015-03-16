@@ -1,6 +1,5 @@
 package solarcraft.world.decor;
 
-import static net.minecraftforge.event.terraingen.DecorateBiomeEvent.Decorate.EventType.TREE;
 import static net.minecraftforge.event.terraingen.OreGenEvent.GenerateMinable.EventType.COAL;
 import static net.minecraftforge.event.terraingen.OreGenEvent.GenerateMinable.EventType.DIAMOND;
 import static net.minecraftforge.event.terraingen.OreGenEvent.GenerateMinable.EventType.DIRT;
@@ -12,7 +11,6 @@ import static net.minecraftforge.event.terraingen.OreGenEvent.GenerateMinable.Ev
 import net.minecraft.init.Blocks;
 import net.minecraft.world.biome.BiomeDecorator;
 import net.minecraft.world.biome.BiomeGenBase;
-import net.minecraft.world.gen.feature.WorldGenAbstractTree;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.terraingen.OreGenEvent;
 import net.minecraftforge.event.terraingen.TerrainGen;
@@ -33,32 +31,6 @@ public class BiomeSpaceDecorator extends BiomeDecorator
     		asteroidGen.generate(this.currentWorld, this.randomGenerator, chunk_X, this.randomGenerator.nextInt(255), chunk_Z);
     	}
         this.generateOres();
-        
-        int i = 1;
-
-        if (this.randomGenerator.nextInt(10) == 0)
-        {
-            ++i;
-        }
-        
-        int k;
-        int l;
-        int i1;
-
-        boolean doGen = TerrainGen.decorate(currentWorld, randomGenerator, chunk_X, chunk_Z, TREE);
-        for (int j = 0; doGen && j < i; ++j)
-        {
-            k = this.chunk_X + this.randomGenerator.nextInt(16) + 8;
-            l = this.chunk_Z + this.randomGenerator.nextInt(16) + 8;
-            i1 = this.currentWorld.getHeightValue(k, l);
-            WorldGenAbstractTree worldgenabstracttree = p_150513_1_.func_150567_a(this.randomGenerator);
-            worldgenabstracttree.setScale(1.0D, 1.0D, 1.0D);
-
-            if (worldgenabstracttree.generate(this.currentWorld, this.randomGenerator, k, i1, l))
-            {
-                worldgenabstracttree.func_150524_b(this.currentWorld, this.randomGenerator, k, i1, l);
-            }
-        }
     }
 
     /**

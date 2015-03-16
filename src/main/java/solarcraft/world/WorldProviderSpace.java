@@ -5,7 +5,6 @@ import net.minecraft.potion.Potion;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.WorldProvider;
-import net.minecraft.world.WorldSettings.GameType;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.IChunkProvider;
 import cpw.mods.fml.relauncher.Side;
@@ -18,7 +17,7 @@ public class WorldProviderSpace extends WorldProvider
      */
     public void registerWorldChunkManager()
     {
-        this.worldChunkMgr = new WorldChunkManagerSpace();
+        this.worldChunkMgr = new WorldChunkManagerSpace(this.worldObj);
         this.dimensionId = 0;
         this.hasNoSky = false;
     }

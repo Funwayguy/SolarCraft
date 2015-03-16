@@ -2,7 +2,6 @@ package solarcraft.core;
 
 import net.minecraft.item.Item;
 import net.minecraft.world.biome.BiomeGenBase;
-import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.config.Configuration;
 import org.apache.logging.log4j.Logger;
@@ -61,7 +60,7 @@ public class SolarCraft
     public void init(FMLInitializationEvent event)
     {
     	spaceBiome = new BiomeGenSpace(SC_Settings.spaceBiomeID);
-    	BiomeDictionary.registerBiomeType(spaceBiome);
+    	//BiomeDictionary.registerBiomeType(spaceBiome);
     	
     	DimensionManager.unregisterDimension(0);
     	DimensionManager.unregisterProviderType(0);

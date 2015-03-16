@@ -8,4 +8,5 @@ public class SC_Settings
 	public static int spaceBiomeID = 24;
 	public static float asteroidWeight = -35F;
 	public static boolean genGrass = false;
+	public static int asteroidSize = 32;
 }

@@ -2,7 +2,6 @@ package solarcraft.world;
 
 import java.util.List;
 import java.util.Random;
-import solarcraft.core.SC_Settings;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockFalling;
 import net.minecraft.block.material.Material;
@@ -17,9 +16,13 @@ import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.gen.NoiseGenerator;
 import net.minecraft.world.gen.NoiseGeneratorOctaves;
-import net.minecraftforge.common.*;
-import cpw.mods.fml.common.eventhandler.Event.*;
-import net.minecraftforge.event.terraingen.*;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.terraingen.ChunkProviderEvent;
+import net.minecraftforge.event.terraingen.PopulateChunkEvent;
+import net.minecraftforge.event.terraingen.TerrainGen;
+import solarcraft.core.SC_Settings;
+import solarcraft.core.SolarCraft;
+import cpw.mods.fml.common.eventhandler.Event.Result;
 
 public class ChunkProviderSpace implements IChunkProvider
 {
@@ -46,8 +49,8 @@ public class ChunkProviderSpace implements IChunkProvider
         this.endRNG = new Random(p_i2007_2_);
         this.noiseGen1 = new NoiseGeneratorOctaves(this.endRNG, 16);
         this.noiseGen2 = new NoiseGeneratorOctaves(this.endRNG, 16);
-        this.noiseGen3 = new NoiseGeneratorOctaves(this.endRNG, 8);
-        this.noiseGen4 = new NoiseGeneratorOctaves(this.endRNG, 10);
+        this.noiseGen3 = new NoiseGeneratorOctaves(this.endRNG, 16); // Normally 8
+        this.noiseGen4 = new NoiseGeneratorOctaves(this.endRNG, 16); // Normally 10
         this.noiseGen5 = new NoiseGeneratorOctaves(this.endRNG, 16);
 
         NoiseGenerator[] noiseGens = {noiseGen1, noiseGen2, noiseGen3, noiseGen4, noiseGen5};
@@ -63,7 +66,7 @@ public class ChunkProviderSpace implements IChunkProvider
     {
         byte b0 = 2;
         int k = b0 + 1;
-        byte b1 = 33;
+        byte b1 = (byte)(SC_Settings.asteroidSize + 1);//33;
         int l = b0 + 1;
         this.densities = this.initializeNoiseField(this.densities, p_147420_1_ * b0, 0, p_147420_2_ * b0, k, b1, l);
 
@@ -71,7 +74,7 @@ public class ChunkProviderSpace implements IChunkProvider
         {
             for (int j1 = 0; j1 < b0; ++j1)
             {
-                for (int k1 = 0; k1 < 32; ++k1)
+                for (int k1 = 0; k1 < b1-1/*32*/; ++k1)
                 {
                     double d0 = 0.25D;
                     double d1 = this.densities[((i1 + 0) * l + j1 + 0) * b1 + k1 + 0];
@@ -93,8 +96,8 @@ public class ChunkProviderSpace implements IChunkProvider
 
                         for (int i2 = 0; i2 < 8; ++i2)
                         {
-                            int j2 = i2 + i1 * 8 << 11 | 0 + j1 * 8 << 7 | k1 * 4 + l1;
-                            short short1 = 128;
+                            int j2 = i2 + i1 * 8 << 12 | 0 + j1 * 8 << 8 | k1 * 4 + l1;
+                            short short1 = 256;
                             double d14 = 0.125D;
                             double d15 = d10;
                             double d16 = (d11 - d10) * d14;
@@ -134,6 +137,11 @@ public class ChunkProviderSpace implements IChunkProvider
     }
     public void replaceBiomeBlocks(int p_147421_1_, int p_147421_2_, Block[] p_147421_3_, BiomeGenBase[] p_147421_4_, byte[] meta)
     {
+    	if(!SC_Settings.genGrass)
+    	{
+    		return;
+    	}
+    	
         ChunkProviderEvent.ReplaceBiomeBlocks event = new ChunkProviderEvent.ReplaceBiomeBlocks(this, p_147421_1_, p_147421_2_, p_147421_3_, meta, p_147421_4_, this.endWorld);
         MinecraftForge.EVENT_BUS.post(event);
         if (event.getResult() == Result.DENY) return;
@@ -142,49 +150,62 @@ public class ChunkProviderSpace implements IChunkProvider
         {
             for (int l = 0; l < 16; ++l)
             {
-                byte b0 = 1;
-                int i1 = -1;
-                Block block = SC_Settings.genGrass? Blocks.grass : Blocks.stone;
-                Block block1 = SC_Settings.genGrass? Blocks.dirt : Blocks.stone;
-
-                for (int j1 = 127; j1 >= 0; --j1)
+                BiomeGenBase biomegenbase = p_147421_4_[l + k * 16];
+                biomegenbase.genTerrainBlocks(this.endWorld, this.endRNG, p_147421_3_, meta, p_147421_1_ * 16 + k, p_147421_2_ * 16 + l, 1D);
+                
+                // Cleanup blocks which would otherwise cause issues or just look out of place
+                int i1 = (p_147421_1_ * 16 + k) & 15;
+                int j1 = (p_147421_2_ * 16 + l) & 15;
+                int k1 = p_147421_3_.length / 256;
+                
+                boolean flag = false; // In charge of marking out surface blocks such as grass
+                boolean flag2 = false; // Flags blocks that could possibly fall to gravity
+                int filler = 0;
+                
+                for (int l1 = 255; l1 >= 0; --l1)
                 {
-                    int k1 = (l * 16 + k) * 128 + j1;
-                    Block block2 = p_147421_3_[k1];
-
-                    if (block2 != null && block2.getMaterial() != Material.air)
+                    int i2 = (j1 * 16 + i1) * k1 + l1;
+                    
+                    // Allows top soil to be properly generated below old sea level
+                    if(p_147421_3_[i2] == null || p_147421_3_[i2].getMaterial() == Material.air)
                     {
-                        if (block2 == Blocks.stone)
-                        {
-                            if (i1 == -1)
-                            {
-                                if (b0 <= 0)
-                                {
-                                    block = null;
-                                    block1 = Blocks.stone;
-                                }
-
-                                i1 = b0;
-
-                                if (j1 >= 0)
-                                {
-                                    p_147421_3_[k1] = block;
-                                }
-                                else
-                                {
-                                    p_147421_3_[k1] = block1;
-                                }
-                            }
-                            else if (i1 > 0)
-                            {
-                                --i1;
-                                p_147421_3_[k1] = block1;
-                            }
-                        }
+                    	flag = false;
+                    } else if((p_147421_3_[i2] == biomegenbase.fillerBlock || p_147421_3_[i2] == Blocks.stone) && !flag)
+                    {
+                    	filler = 3;
+                    	p_147421_3_[i2] = biomegenbase.topBlock;
+                    	flag = true;
+                    } else
+                    {
+                    	flag = true;
+                    	
+                    	if(filler > 0 && p_147421_3_[i2] == Blocks.stone)
+                    	{
+                    		p_147421_3_[i2] = biomegenbase.fillerBlock;
+                    		filler--;
+                    	}
                     }
-                    else
+                    
+                    // Stops gravity affected blocks pouring into the void and causing lag spikes
+                    if(flag2 && (p_147421_3_[i2] == null || p_147421_3_[i2].getMaterial() == Material.air))
                     {
-                        i1 = -1;
+                    	p_147421_3_[i2] = Blocks.stone;
+                    	flag2 = false;
+                    } else if(p_147421_3_[i2] != null && p_147421_3_[i2] instanceof BlockFalling)
+                    {
+                    	flag2 = true;
+                    } else
+                    {
+                    	flag2 = false;
+                    }
+                    
+                    // Remove gravel basins and any bedrock
+                    if(p_147421_3_[i2] == Blocks.bedrock)
+                    {
+                    	p_147421_3_[i2] = Blocks.air;
+                    } else if(p_147421_3_[i2] == Blocks.gravel)
+                    {
+                    	p_147421_3_[i2] = Blocks.stone;
                     }
                 }
             }
@@ -206,8 +227,9 @@ public class ChunkProviderSpace implements IChunkProvider
     public Chunk provideChunk(int p_73154_1_, int p_73154_2_)
     {
         this.endRNG.setSeed((long)p_73154_1_ * 341873128712L + (long)p_73154_2_ * 132897987541L);
-        Block[] ablock = new Block[32768];
+        Block[] ablock = new Block[65536];
         byte[] meta = new byte[ablock.length];
+        this.biomesForGeneration = this.endWorld.getWorldChunkManager().getBiomesForGeneration(this.biomesForGeneration, p_73154_1_ * 4 - 2, p_73154_2_ * 4 - 2, 10, 10);
         this.biomesForGeneration = this.endWorld.getWorldChunkManager().loadBlockGeneratorData(this.biomesForGeneration, p_73154_1_ * 16, p_73154_2_ * 16, 16, 16);
         this.func_147420_a(p_73154_1_, p_73154_2_, ablock, this.biomesForGeneration);
         this.replaceBiomeBlocks(p_73154_1_, p_73154_2_, ablock, this.biomesForGeneration, meta);
@@ -216,7 +238,13 @@ public class ChunkProviderSpace implements IChunkProvider
 
         for (int k = 0; k < abyte.length; ++k)
         {
-            abyte[k] = (byte)this.biomesForGeneration[k].biomeID;
+        	if(SC_Settings.genGrass)
+        	{
+        		abyte[k] = (byte)this.biomesForGeneration[k].biomeID;
+        	} else
+        	{
+        		abyte[k] = (byte)SolarCraft.spaceBiome.biomeID;
+        	}
         }
 
         chunk.generateSkylightMap();
@@ -240,8 +268,10 @@ public class ChunkProviderSpace implements IChunkProvider
 
         double d0 = 684.412D;
         double d1 = 684.412D;
-        this.noiseData4 = this.noiseGen4.generateNoiseOctaves(this.noiseData4, p_73187_2_, p_73187_4_, p_73187_5_, p_73187_7_, 1.121D, 1.121D, 0.5D);
-        this.noiseData5 = this.noiseGen5.generateNoiseOctaves(this.noiseData5, p_73187_2_, p_73187_4_, p_73187_5_, p_73187_7_, 200.0D, 200.0D, 0.5D);
+        this.noiseData4 = this.noiseGen4.generateNoiseOctaves(this.noiseData4, p_73187_2_, p_73187_4_, p_73187_5_, p_73187_7_, 1.121D, 1.121D, 0.5D); // Original
+        //this.noiseData4 = this.noiseGen4.generateNoiseOctaves(this.noiseData4, p_73187_2_, p_73187_3_, p_73187_4_, p_73187_5_, p_73187_6_, p_73187_7_, d0 * 2D, d1, d0 * 2D);
+        this.noiseData5 = this.noiseGen5.generateNoiseOctaves(this.noiseData5, p_73187_2_, p_73187_4_, p_73187_5_, p_73187_7_, 200.0D, 200.0D, 0.5D); // Original
+        //this.noiseData5 = this.noiseGen5.generateNoiseOctaves(this.noiseData5, p_73187_2_, p_73187_3_, p_73187_4_, p_73187_5_, p_73187_6_, p_73187_7_, d0 * 2D, d1, d0 * 2D);
         d0 *= 2.0D;
         this.noiseData1 = this.noiseGen3.generateNoiseOctaves(this.noiseData1, p_73187_2_, p_73187_3_, p_73187_4_, p_73187_5_, p_73187_6_, p_73187_7_, d0 / 80.0D, d1 / 160.0D, d0 / 80.0D);
         this.noiseData2 = this.noiseGen1.generateNoiseOctaves(this.noiseData2, p_73187_2_, p_73187_3_, p_73187_4_, p_73187_5_, p_73187_6_, p_73187_7_, d0, d1, d0);
@@ -270,7 +300,9 @@ public class ChunkProviderSpace implements IChunkProvider
                 d3 = d3 * 3.0D - 2.0D;
                 float f = (float)(i2 + p_73187_2_) / 1.0F;
                 float f1 = (float)(j2 + p_73187_4_) / 1.0F;
-                float f2 = MathHelper.clamp_float(100F - MathHelper.sqrt_float(f * f + f1 * f1) * 16.0F, SC_Settings.asteroidWeight, 100F);//Percentage of the island's density at this position
+                
+                float spawnWeight = 100F - MathHelper.sqrt_float(f * f + f1 * f1) * 16.0F;
+                float f2 = MathHelper.clamp_float(spawnWeight, SC_Settings.asteroidWeight, 100F);//Percentage of the island's density at this position
 
                 if (f2 > 80.0F)
                 {
@@ -334,7 +366,8 @@ public class ChunkProviderSpace implements IChunkProvider
 
                     if (k2 > p_73187_6_ / 2 - b0)
                     {
-                        d10 = (double)((float)(k2 - (p_73187_6_ / 2 - b0)) / 64.0F);
+                        //d10 = (double)((float)(k2 - (p_73187_6_ / 2 - b0)) / 64.0F);
+                        d10 = (double)((float)(k2 - (p_73187_6_ / 2 - b0)) / 256.0F);
 
                         if (d10 < 0.0D)
                         {
@@ -385,8 +418,15 @@ public class ChunkProviderSpace implements IChunkProvider
 
         int k = p_73153_2_ * 16;
         int l = p_73153_3_ * 16;
-        BiomeGenBase biomegenbase = this.endWorld.getBiomeGenForCoords(k + 16, l + 16);
-        biomegenbase.decorate(this.endWorld, this.endWorld.rand, k, l);
+        
+        if(SC_Settings.genGrass)
+        {
+        	BiomeGenBase biomegenbase = this.endWorld.getBiomeGenForCoords(k + 16, l + 16);
+        	biomegenbase.decorate(this.endWorld, this.endWorld.rand, k, l);
+        } else
+        {
+        	SolarCraft.spaceBiome.decorate(this.endWorld, this.endWorld.rand, k, l);
+        }
 
         MinecraftForge.EVENT_BUS.post(new PopulateChunkEvent.Post(p_73153_1_, endWorld, endWorld.rand, p_73153_2_, p_73153_3_, false));
 
