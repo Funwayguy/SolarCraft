@@ -9,4 +9,6 @@ public class SC_Settings
 	public static float asteroidWeight = -35F;
 	public static boolean genGrass = false;
 	public static int asteroidSize = 32;
+	public static boolean genOres = true;
+	public static boolean scorchedEarth = false;
 }

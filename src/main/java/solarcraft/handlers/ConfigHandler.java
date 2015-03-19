@@ -24,6 +24,9 @@ public class ConfigHandler
 		SC_Settings.asteroidWeight = config.getFloat("Asteroid Weight", Configuration.CATEGORY_GENERAL, -35, -100F, 100F, "Weighted density of asteroids/landmasses");
 		SC_Settings.genGrass = config.getBoolean("Use Old Biomes", Configuration.CATEGORY_GENERAL, false, "Use the overworlds old biomes instead. Makes for a good 'blown apart world' look");
 		SC_Settings.asteroidSize = config.getInt("Asteroid Size", Configuration.CATEGORY_GENERAL, 64, 16, 64, "Maximum size of an asteroid");
+		SC_Settings.scorchedEarth = config.getBoolean("Scorched Earth", Configuration.CATEGORY_GENERAL, false, "Decades of solar radiation has burnt away most of the plant life");
+		SC_Settings.genGrass = config.getBoolean("Use Old Biomes", Configuration.CATEGORY_GENERAL, false, "Use the overworlds old biomes instead. Makes for a good 'blown apart world' look");
+		SC_Settings.genOres = config.getBoolean("Generate Ores", Configuration.CATEGORY_GENERAL, true, "Set whether ores should generate inside the asteroids");
 		
 		config.save();
 		

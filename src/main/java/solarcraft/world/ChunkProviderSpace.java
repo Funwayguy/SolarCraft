@@ -150,8 +150,8 @@ public class ChunkProviderSpace implements IChunkProvider
         {
             for (int l = 0; l < 16; ++l)
             {
-                BiomeGenBase biomegenbase = p_147421_4_[l + k * 16];
-                biomegenbase.genTerrainBlocks(this.endWorld, this.endRNG, p_147421_3_, meta, p_147421_1_ * 16 + k, p_147421_2_ * 16 + l, 1D);
+                BiomeGenBase biome = p_147421_4_[l + k * 16];
+                biome.genTerrainBlocks(this.endWorld, this.endRNG, p_147421_3_, meta, p_147421_1_ * 16 + k, p_147421_2_ * 16 + l, 1D);
                 
                 // Cleanup blocks which would otherwise cause issues or just look out of place
                 int i1 = (p_147421_1_ * 16 + k) & 15;
@@ -170,10 +170,10 @@ public class ChunkProviderSpace implements IChunkProvider
                     if(p_147421_3_[i2] == null || p_147421_3_[i2].getMaterial() == Material.air)
                     {
                     	flag = false;
-                    } else if((p_147421_3_[i2] == biomegenbase.fillerBlock || p_147421_3_[i2] == Blocks.stone) && !flag)
+                    } else if((p_147421_3_[i2] == biome.fillerBlock || p_147421_3_[i2] == Blocks.stone) && !flag)
                     {
                     	filler = 3;
-                    	p_147421_3_[i2] = biomegenbase.topBlock;
+                    	p_147421_3_[i2] = biome.topBlock;
                     	flag = true;
                     } else
                     {
@@ -181,7 +181,7 @@ public class ChunkProviderSpace implements IChunkProvider
                     	
                     	if(filler > 0 && p_147421_3_[i2] == Blocks.stone)
                     	{
-                    		p_147421_3_[i2] = biomegenbase.fillerBlock;
+                    		p_147421_3_[i2] = biome.fillerBlock;
                     		filler--;
                     	}
                     }
@@ -206,6 +206,10 @@ public class ChunkProviderSpace implements IChunkProvider
                     } else if(p_147421_3_[i2] == Blocks.gravel)
                     {
                     	p_147421_3_[i2] = Blocks.stone;
+                    } else if(SC_Settings.scorchedEarth && p_147421_3_[i2] != null && (p_147421_3_[i2].getMaterial() == Material.grass || p_147421_3_[i2].getMaterial() == Material.plants || p_147421_3_[i2].getMaterial() == Material.leaves || p_147421_3_[i2].getMaterial() == Material.ground))
+                    {
+                    	p_147421_3_[i2] = Blocks.stained_hardened_clay;
+                    	meta[i2] = 15;
                     }
                 }
             }

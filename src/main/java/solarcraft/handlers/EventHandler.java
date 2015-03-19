@@ -7,8 +7,11 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.MathHelper;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
+import net.minecraftforge.event.terraingen.OreGenEvent.GenerateMinable;
+import solarcraft.core.SC_Settings;
 import solarcraft.core.SolarCraft;
 import cpw.mods.fml.client.event.ConfigChangedEvent;
+import cpw.mods.fml.common.eventhandler.Event.Result;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 
@@ -61,6 +64,15 @@ public class EventHandler
 					entity.motionY = MathHelper.clamp_double(entity.motionY, -3D, 3D); // Make sure entity hasn't started going too fast
 				}
 			}
+		}
+	}
+	
+	@SubscribeEvent
+	public void onGenerate(GenerateMinable event)
+	{
+		if(!SC_Settings.genOres)
+		{
+			event.setResult(Result.DENY);
 		}
 	}
 }
