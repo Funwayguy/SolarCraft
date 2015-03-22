@@ -35,7 +35,7 @@ public class WorldProviderSpace extends WorldProvider
      */
     public float calculateCelestialAngle(long p_76563_1_, float p_76563_3_)
     {
-        return (float)(this.worldObj.getWorldTime()/24000D);
+    	return super.calculateCelestialAngle(p_76563_1_, p_76563_3_);
     }
 
     /**
@@ -53,6 +53,7 @@ public class WorldProviderSpace extends WorldProvider
     @SideOnly(Side.CLIENT)
     public Vec3 getFogColor(float p_76562_1_, float p_76562_2_)
     {
+    	//return super.getFogColor(p_76562_1_, p_76562_2_);
 		if(Minecraft.getMinecraft().thePlayer != null && Minecraft.getMinecraft().thePlayer.isPotionActive(Potion.nightVision))
 		{
 			return Vec3.createVectorHelper(1D, 1D, 1D);

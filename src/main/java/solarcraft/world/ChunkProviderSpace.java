@@ -49,8 +49,8 @@ public class ChunkProviderSpace implements IChunkProvider
         this.endRNG = new Random(p_i2007_2_);
         this.noiseGen1 = new NoiseGeneratorOctaves(this.endRNG, 16);
         this.noiseGen2 = new NoiseGeneratorOctaves(this.endRNG, 16);
-        this.noiseGen3 = new NoiseGeneratorOctaves(this.endRNG, 16); // Normally 8
-        this.noiseGen4 = new NoiseGeneratorOctaves(this.endRNG, 16); // Normally 10
+        this.noiseGen3 = new NoiseGeneratorOctaves(this.endRNG, 8); // Normally 8
+        this.noiseGen4 = new NoiseGeneratorOctaves(this.endRNG, 10); // Normally 10
         this.noiseGen5 = new NoiseGeneratorOctaves(this.endRNG, 16);
 
         NoiseGenerator[] noiseGens = {noiseGen1, noiseGen2, noiseGen3, noiseGen4, noiseGen5};
@@ -74,7 +74,7 @@ public class ChunkProviderSpace implements IChunkProvider
         {
             for (int j1 = 0; j1 < b0; ++j1)
             {
-                for (int k1 = 0; k1 < b1-1/*32*/; ++k1)
+                for (int k1 = 0; k1 < SC_Settings.asteroidSize/*32*/; ++k1)
                 {
                     double d0 = 0.25D;
                     double d1 = this.densities[((i1 + 0) * l + j1 + 0) * b1 + k1 + 0];
@@ -150,8 +150,24 @@ public class ChunkProviderSpace implements IChunkProvider
         {
             for (int l = 0; l < 16; ++l)
             {
+                float f = (p_147421_1_ * 16) + l;
+                float f1 = (p_147421_2_ * 16) + k;
+                
+                float spawnDist = MathHelper.sqrt_float(f * f + f1 * f1);
+                
                 BiomeGenBase biome = p_147421_4_[l + k * 16];
-                biome.genTerrainBlocks(this.endWorld, this.endRNG, p_147421_3_, meta, p_147421_1_ * 16 + k, p_147421_2_ * 16 + l, 1D);
+                
+                if(spawnDist >= SC_Settings.scorchedArea && SC_Settings.genGrass)
+                {
+                	biome = p_147421_4_[l + k * 16];
+                	biome.genTerrainBlocks(this.endWorld, this.endRNG, p_147421_3_, meta, p_147421_1_ * 16 + k, p_147421_2_ * 16 + l, 1D);
+                } else
+                {
+                	biome = SolarCraft.spaceBiome;
+                	biome.genTerrainBlocks(this.endWorld, this.endRNG, p_147421_3_, meta, p_147421_1_ * 16 + k, p_147421_2_ * 16 + l, 1D);
+                	
+                	continue;
+                }
                 
                 // Cleanup blocks which would otherwise cause issues or just look out of place
                 int i1 = (p_147421_1_ * 16 + k) & 15;
@@ -162,7 +178,7 @@ public class ChunkProviderSpace implements IChunkProvider
                 boolean flag2 = false; // Flags blocks that could possibly fall to gravity
                 int filler = 0;
                 
-                for (int l1 = 255; l1 >= 0; --l1)
+                for (int l1 = 64; l1 >= 0; --l1)
                 {
                     int i2 = (j1 * 16 + i1) * k1 + l1;
                     
@@ -179,7 +195,7 @@ public class ChunkProviderSpace implements IChunkProvider
                     {
                     	flag = true;
                     	
-                    	if(filler > 0 && p_147421_3_[i2] == Blocks.stone)
+                    	if(filler > 0 && p_147421_3_[i2] != Blocks.air && p_147421_3_[i2] != null)
                     	{
                     		p_147421_3_[i2] = biome.fillerBlock;
                     		filler--;
@@ -205,12 +221,14 @@ public class ChunkProviderSpace implements IChunkProvider
                     	p_147421_3_[i2] = Blocks.air;
                     } else if(p_147421_3_[i2] == Blocks.gravel)
                     {
-                    	p_147421_3_[i2] = Blocks.stone;
-                    } else if(SC_Settings.scorchedEarth && p_147421_3_[i2] != null && (p_147421_3_[i2].getMaterial() == Material.grass || p_147421_3_[i2].getMaterial() == Material.plants || p_147421_3_[i2].getMaterial() == Material.leaves || p_147421_3_[i2].getMaterial() == Material.ground))
-                    {
-                    	p_147421_3_[i2] = Blocks.stained_hardened_clay;
-                    	meta[i2] = 15;
-                    }
+                    	p_147421_3_[i2] = biome.fillerBlock;
+                    	meta[i2] = 1;
+                    	
+                    }// else if(SC_Settings.scorchedEarth && p_147421_3_[i2] != null && (p_147421_3_[i2].getMaterial() == Material.grass || p_147421_3_[i2].getMaterial() == Material.plants || p_147421_3_[i2].getMaterial() == Material.leaves || p_147421_3_[i2].getMaterial() == Material.ground))
+                    //{
+                    	//p_147421_3_[i2] = Blocks.stained_hardened_clay;
+                    	//meta[i2] = 15;
+                    //}
                 }
             }
         }
@@ -233,7 +251,7 @@ public class ChunkProviderSpace implements IChunkProvider
         this.endRNG.setSeed((long)p_73154_1_ * 341873128712L + (long)p_73154_2_ * 132897987541L);
         Block[] ablock = new Block[65536];
         byte[] meta = new byte[ablock.length];
-        this.biomesForGeneration = this.endWorld.getWorldChunkManager().getBiomesForGeneration(this.biomesForGeneration, p_73154_1_ * 4 - 2, p_73154_2_ * 4 - 2, 10, 10);
+        this.biomesForGeneration = this.endWorld.getWorldChunkManager().getBiomesForGeneration(this.biomesForGeneration, p_73154_1_ * 4 - 2, p_73154_2_ * 4 - 2, 16, 16);
         this.biomesForGeneration = this.endWorld.getWorldChunkManager().loadBlockGeneratorData(this.biomesForGeneration, p_73154_1_ * 16, p_73154_2_ * 16, 16, 16);
         this.func_147420_a(p_73154_1_, p_73154_2_, ablock, this.biomesForGeneration);
         this.replaceBiomeBlocks(p_73154_1_, p_73154_2_, ablock, this.biomesForGeneration, meta);
@@ -242,13 +260,26 @@ public class ChunkProviderSpace implements IChunkProvider
 
         for (int k = 0; k < abyte.length; ++k)
         {
-        	if(SC_Settings.genGrass)
+            float f = (p_73154_2_ * 16) + (k % 16);
+            float f1 = (p_73154_1_ * 16) + ((k - (k%16))/16);
+            
+            float spawnDist = MathHelper.sqrt_float(f * f + f1 * f1);
+            
+            if(spawnDist >= SC_Settings.scorchedArea && SC_Settings.genGrass)
+            {
+        		abyte[k] = (byte)this.biomesForGeneration[k].biomeID;
+            } else
+            {
+        		abyte[k] = (byte)SolarCraft.spaceBiome.biomeID;
+            }
+            
+        	/*if(SC_Settings.genGrass)
         	{
         		abyte[k] = (byte)this.biomesForGeneration[k].biomeID;
         	} else
         	{
         		abyte[k] = (byte)SolarCraft.spaceBiome.biomeID;
-        	}
+        	}*/
         }
 
         chunk.generateSkylightMap();
@@ -302,11 +333,19 @@ public class ChunkProviderSpace implements IChunkProvider
                 }
 
                 d3 = d3 * 3.0D - 2.0D;
-                float f = (float)(i2 + p_73187_2_) / 1.0F;
-                float f1 = (float)(j2 + p_73187_4_) / 1.0F;
+                float f = (float)(i2 + p_73187_2_) / 0.1F;
+                float f1 = (float)(j2 + p_73187_4_) / 0.1F;
+                float spawnDist = MathHelper.sqrt_float(f * f + f1 * f1);
                 
-                float spawnWeight = 100F - MathHelper.sqrt_float(f * f + f1 * f1) * 16.0F;
-                float f2 = MathHelper.clamp_float(spawnWeight, SC_Settings.asteroidWeight, 100F);//Percentage of the island's density at this position
+                float boundryMidDist = Math.abs(spawnDist - ((float)SC_Settings.scorchedArea + ((float)SC_Settings.scorchedBoundry/2F)));
+                
+                float spawnWeight = 100F - (spawnDist * SC_Settings.spawnIsland/10F);
+                float f2 = MathHelper.clamp_float(spawnWeight, SC_Settings.asteroidWeight, 80F);//Percentage of the island's density at this position
+                
+                if(boundryMidDist <= SC_Settings.scorchedBoundry/2F + 4)
+                {
+                	f2 -= 100 * ((SC_Settings.scorchedBoundry/2F + 4) - boundryMidDist)/4F;
+                }
 
                 if (f2 > 80.0F)
                 {
