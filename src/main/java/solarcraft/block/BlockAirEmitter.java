@@ -3,6 +3,7 @@ package solarcraft.block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
@@ -21,6 +22,7 @@ public class BlockAirEmitter extends BlockContainer implements IAirProvider
 	{
 		super(Material.iron);
 		this.setBlockName("solarcraft.air_emitter");
+		this.setCreativeTab(CreativeTabs.tabRedstone);
 	}
 
     /**
