@@ -1,14 +1,7 @@
 package solarcraft.world.biomes;
 
 import java.util.Random;
-import org.apache.logging.log4j.Level;
-import solarcraft.core.SC_Settings;
-import solarcraft.core.SolarCraft;
-import solarcraft.world.decor.BiomeSpaceDecorator;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
 import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.entity.monster.EntitySkeleton;
@@ -20,10 +13,15 @@ import net.minecraft.init.Blocks;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
+import solarcraft.core.SC_Settings;
+import solarcraft.world.decor.BiomeSpaceDecorator;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 public class BiomeGenSpace extends BiomeGenBase
 {
 
+	@SuppressWarnings("unchecked")
 	public BiomeGenSpace(int id)
 	{
         super(id);

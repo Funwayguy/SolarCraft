@@ -13,7 +13,6 @@ import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.biome.WorldChunkManager;
 import net.minecraft.world.gen.layer.GenLayer;
 import net.minecraft.world.gen.layer.IntCache;
-import solarcraft.core.SolarCraft;
 
 public class WorldChunkManagerSpace extends WorldChunkManager
 {

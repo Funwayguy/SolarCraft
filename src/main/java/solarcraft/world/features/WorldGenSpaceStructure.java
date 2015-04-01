@@ -15,11 +15,11 @@ public class WorldGenSpaceStructure implements IWorldGenerator
 			return;
 		}
 		
-		int x = chunkX * 16;
+		/*int x = chunkX * 16;
 		int y = random.nextInt(192) + 32;
 		int z = chunkZ * 16;
 		
-		/*if(random.nextInt(100) == 0)
+		if(random.nextInt(100) == 0)
 		{
 			StructureBase structure = new StructureStation(world, x, y, z);
 			structure.Build();

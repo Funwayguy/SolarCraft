@@ -8,6 +8,7 @@ import net.minecraft.init.Blocks;
  */
 public class SC_Settings
 {
+	public static boolean badAir = false;
 	public static int spaceBiomeID = 24;
 	public static float asteroidWeight = -35F;
 	public static boolean genGrass = false;

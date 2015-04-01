@@ -1,7 +1,5 @@
 package solarcraft.handlers;
 
-import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
 import net.minecraftforge.common.config.Configuration;
 import org.apache.logging.log4j.Level;
 import solarcraft.core.SC_Settings;
@@ -52,6 +50,7 @@ public class ConfigHandler
 		SC_Settings.genGrass = config.getBoolean("Use Old Biomes", Configuration.CATEGORY_GENERAL, false, "Use the overworlds old biomes instead. Makes for a good 'blown apart world' look");
 		SC_Settings.genOres = config.getBoolean("Generate Ores", Configuration.CATEGORY_GENERAL, true, "Set whether ores should generate inside the asteroids");
 		SC_Settings.cakeLayers = config.getStringList("Scorched Layers", Configuration.CATEGORY_GENERAL, layerDefault, "Set whether ores should generate inside the asteroids");
+		SC_Settings.badAir = config.getBoolean("Bad Space Air", Configuration.CATEGORY_GENERAL, false, "[WIP] Without an air emitter the player will slowly take damage");
 		
 		config.save();
 		

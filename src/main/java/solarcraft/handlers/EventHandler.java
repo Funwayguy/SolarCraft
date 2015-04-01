@@ -5,6 +5,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityFlying;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.MathHelper;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.terraingen.OreGenEvent.GenerateMinable;
@@ -37,6 +38,24 @@ public class EventHandler
 			if(event.entityLiving.motionY > -1D)
 			{
 				event.entityLiving.fallDistance = 0F;
+			}
+		}
+		
+		if(SC_Settings.badAir && !event.entityLiving.worldObj.isRemote && event.entityLiving instanceof EntityPlayer)
+		{
+			int ex = MathHelper.floor_double(event.entityLiving.posX);
+			int ey = MathHelper.floor_double(event.entityLiving.posY);
+			int ez = MathHelper.floor_double(event.entityLiving.posZ);
+			
+			long airTime = event.entityLiving.getEntityData().getLong("SolarCraft_AirTime");
+			
+			if(event.entityLiving.worldObj.getBlock(ex, ey, ez) == SolarCraft.spaceAir || event.entityLiving.worldObj.getBlock(ex, ey + 1, ez) == SolarCraft.spaceAir)
+			{
+				airTime = event.entityLiving.worldObj.getTotalWorldTime();
+				event.entityLiving.getEntityData().setLong("SolarCraft_AirTime", airTime);
+			} else if(event.entityLiving.getRNG().nextInt(10) == 0 && event.entityLiving.worldObj.getTotalWorldTime() - airTime > 100)
+			{
+				event.entityLiving.attackEntityFrom(DamageSource.inWall, 2.0F);
 			}
 		}
 	}

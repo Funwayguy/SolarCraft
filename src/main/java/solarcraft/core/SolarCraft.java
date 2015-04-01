@@ -1,10 +1,16 @@
 package solarcraft.core;
 
-import net.minecraft.item.Item;
+import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemStack;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.config.Configuration;
 import org.apache.logging.log4j.Logger;
+import solarcraft.block.BlockAirEmitter;
+import solarcraft.block.BlockSpaceAir;
+import solarcraft.block.tile.TileEntityAirEmitter;
 import solarcraft.core.proxies.CommonProxy;
 import solarcraft.handlers.ConfigHandler;
 import solarcraft.world.WorldProviderSpace;
@@ -39,11 +45,8 @@ public class SolarCraft
 	public static Logger logger;
 	
 	public static BiomeGenBase spaceBiome;
-	
-	/**
-	 * Purely used for returning faking filled slots
-	 */
-	public static Item locked;
+	public static Block spaceAir;
+	public static Block airEmitter;
     
     @EventHandler
     public void preInit(FMLPreInitializationEvent event)
@@ -59,6 +62,15 @@ public class SolarCraft
     @EventHandler
     public void init(FMLInitializationEvent event)
     {
+    	spaceAir = new BlockSpaceAir();
+    	GameRegistry.registerBlock(spaceAir, "space_air");
+    	
+    	airEmitter = new BlockAirEmitter();
+    	GameRegistry.registerBlock(airEmitter, "air_emitter");
+    	GameRegistry.registerTileEntity(TileEntityAirEmitter.class, "solarcraft.air_emitter");
+    	
+    	GameRegistry.addShapedRecipe(new ItemStack(airEmitter), "XXX", "XTX", "IRI", 'X', new ItemStack(Blocks.iron_bars), 'T', new ItemStack(Blocks.piston), 'I', new ItemStack(Items.iron_ingot), 'R', new ItemStack(Items.redstone));
+    	
     	spaceBiome = new BiomeGenSpace(SC_Settings.spaceBiomeID);
     	//BiomeDictionary.registerBiomeType(spaceBiome);
     	
