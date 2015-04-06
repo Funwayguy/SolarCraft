@@ -23,6 +23,7 @@ public class BlockAirEmitter extends BlockContainer implements IAirProvider
 		super(Material.iron);
 		this.setBlockName("solarcraft.air_emitter");
 		this.setCreativeTab(CreativeTabs.tabRedstone);
+		this.setHardness(5F);
 	}
 
     /**

@@ -1,11 +1,11 @@
 package solarcraft.client;
 
-import org.lwjgl.opengl.GL11;
 import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.StatCollector;
+import org.lwjgl.opengl.GL11;
 import solarcraft.block.tile.TileEntityAirEmitter;
 import solarcraft.inventory.ContainerAirEmitter;
 
@@ -25,8 +25,8 @@ public class GuiAirEmitter extends GuiContainer
      */
     protected void drawGuiContainerForegroundLayer(int p_146979_1_, int p_146979_2_)
     {
-        this.fontRendererObj.drawString(I18n.format("container.inventory", new Object[0]), 8, this.ySize - 96 + 2, 4210752);
-        this.fontRendererObj.drawString("Air: " + airTile.airTime, 64, 60, 4210752);
+        this.fontRendererObj.drawString(StatCollector.translateToLocalFormatted("container.inventory", new Object[0]), 8, this.ySize - 96 + 2, 4210752);
+        this.fontRendererObj.drawString(StatCollector.translateToLocalFormatted("gui.solarcraft.air", airTile.airTime), 64, 60, 4210752);
     }
 	
 	@Override

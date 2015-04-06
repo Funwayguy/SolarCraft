@@ -51,6 +51,8 @@ public class ConfigHandler
 		SC_Settings.genOres = config.getBoolean("Generate Ores", Configuration.CATEGORY_GENERAL, true, "Set whether ores should generate inside the asteroids");
 		SC_Settings.cakeLayers = config.getStringList("Scorched Layers", Configuration.CATEGORY_GENERAL, layerDefault, "Set whether ores should generate inside the asteroids");
 		SC_Settings.badAir = config.getBoolean("Bad Space Air", Configuration.CATEGORY_GENERAL, false, "[WIP] Without an air emitter the player will slowly take damage");
+		SC_Settings.debugAir = config.getBoolean("Debug Air", Configuration.CATEGORY_GENERAL, false, "Enables rendering space air as glass blocks. Used for debugging");
+		SC_Settings.airInterval = config.getInt("Air Interval", Configuration.CATEGORY_GENERAL, 10, 0, 300, "The interval between air updates. Set to 0 to tick randomly");
 		
 		config.save();
 		

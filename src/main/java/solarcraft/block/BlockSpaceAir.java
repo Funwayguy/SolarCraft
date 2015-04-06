@@ -1,6 +1,7 @@
 package solarcraft.block;
 
 import java.util.Random;
+import solarcraft.core.SC_Settings;
 import solarcraft.core.SolarCraft;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -19,6 +20,7 @@ public class BlockSpaceAir extends Block implements IAirProvider
         this.setTickRandomly(true);
         this.setBlockName("solarcraft.space_air");
         this.setCreativeTab(CreativeTabs.tabMisc);
+		this.setBlockTextureName("glass");
     }
     
     /**
@@ -36,7 +38,11 @@ public class BlockSpaceAir extends Block implements IAirProvider
     public void onBlockAdded(World world, int x, int y, int z)
     {
     	super.onBlockAdded(world, x, y, z);
-    	world.scheduleBlockUpdate(x, y, z, this, this.tickRate(world));
+    	
+    	if(SC_Settings.airInterval > 0)
+    	{
+    		world.scheduleBlockUpdate(x, y, z, this, this.tickRate(world));
+    	}
     }
     
     /**
@@ -45,7 +51,7 @@ public class BlockSpaceAir extends Block implements IAirProvider
     @Override
     public int tickRate(World world)
     {
-        return 10;
+        return SC_Settings.airInterval;
     }
     
     @Override
@@ -103,7 +109,7 @@ public class BlockSpaceAir extends Block implements IAirProvider
      */
     public int getRenderType()
     {
-        return -1;
+        return SC_Settings.debugAir? 0 : -1;
     }
 
     /**
@@ -148,7 +154,10 @@ public class BlockSpaceAir extends Block implements IAirProvider
     @Override
     public void onNeighborBlockChange(World world, int x, int y, int z, Block block)
     {
-    	world.scheduleBlockUpdate(x, y, z, this, this.tickRate(world));
+    	if(SC_Settings.airInterval > 0)
+    	{
+    		world.scheduleBlockUpdate(x, y, z, this, this.tickRate(world));
+    	}
     }
 
 	@Override
@@ -169,7 +178,10 @@ public class BlockSpaceAir extends Block implements IAirProvider
 		{
 			//world.setBlock(x, y, z, SolarCraft.spaceAir, amount - 1, 3);
 			world.setBlockMetadataWithNotify(x, y, z, amount - 1, 3);
-			world.scheduleBlockUpdate(x, y, z, this, this.tickRate(world));
+			if(SC_Settings.airInterval > 0)
+	    	{
+	    		world.scheduleBlockUpdate(x, y, z, this, this.tickRate(world));
+	    	}
 		}
 	}
 }

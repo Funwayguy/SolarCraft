@@ -8,6 +8,7 @@ import net.minecraft.init.Blocks;
  */
 public class SC_Settings
 {
+	public static boolean debugAir = false;
 	public static boolean badAir = false;
 	public static int spaceBiomeID = 24;
 	public static float asteroidWeight = -35F;
@@ -18,4 +19,5 @@ public class SC_Settings
 	public static float spawnIsland = 24F;
 	public static int scorchedBoundry = 16;
 	public static String[] cakeLayers = new String[]{Block.blockRegistry.getNameForObject(Blocks.stained_hardened_clay) + ":15"};
+	public static int airInterval = 10;
 }
