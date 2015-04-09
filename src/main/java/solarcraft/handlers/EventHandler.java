@@ -1,6 +1,5 @@
 package solarcraft.handlers;
 
-import java.util.List;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityFlying;
 import net.minecraft.entity.EntityLivingBase;
@@ -65,10 +64,10 @@ public class EventHandler
 	{
 		if(event.phase == TickEvent.Phase.START)
 		{
-			List<?> entities = event.world.loadedEntityList;
-			
-			for(Object entry : entities)
+			for(int i = event.world.loadedEntityList.size() - 1; i >= 0; i--)
 			{
+				Object entry = event.world.loadedEntityList.get(i);
+				
 				if(entry == null || !(entry instanceof Entity) || entry instanceof EntityLivingBase)
 				{
 					continue;
