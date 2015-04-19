@@ -1,13 +1,18 @@
 package solarcraft.core;
 
 import net.minecraft.block.Block;
+import net.minecraft.client.renderer.entity.RenderFireball;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidRegistry;
 import org.apache.logging.log4j.Logger;
+import solarcraft.EntitySpawnerFireball;
+import solarcraft.FluidOxygen;
 import solarcraft.block.BlockAirEmitter;
 import solarcraft.block.BlockSpaceAir;
 import solarcraft.block.tile.TileEntityAirEmitter;
@@ -16,6 +21,7 @@ import solarcraft.handlers.ConfigHandler;
 import solarcraft.world.WorldProviderSpace;
 import solarcraft.world.biomes.BiomeGenSpace;
 import solarcraft.world.features.WorldGenSpaceStructure;
+import cpw.mods.fml.client.registry.RenderingRegistry;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
@@ -25,6 +31,7 @@ import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
+import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 
 @Mod(modid = SolarCraft.MODID, version = SolarCraft.VERSION, name = SolarCraft.NAME, guiFactory = "solarcraft.handlers.ConfigGuiFactory")
@@ -47,6 +54,8 @@ public class SolarCraft
 	public static BiomeGenBase spaceBiome;
 	public static Block spaceAir;
 	public static Block airEmitter;
+	
+	public static Fluid LOX;
     
     @EventHandler
     public void preInit(FMLPreInitializationEvent event)
@@ -62,6 +71,12 @@ public class SolarCraft
     @EventHandler
     public void init(FMLInitializationEvent event)
     {
+    	EntityRegistry.registerModEntity(EntitySpawnerFireball.class, "spawner_fireball", EntityRegistry.findGlobalUniqueEntityId(), instance, 128, 15, true);
+    	RenderingRegistry.registerEntityRenderingHandler(EntitySpawnerFireball.class, new RenderFireball(4.0F));
+    	
+    	LOX = new FluidOxygen();
+    	FluidRegistry.registerFluid(LOX);
+    	
     	spaceAir = new BlockSpaceAir();
     	GameRegistry.registerBlock(spaceAir, "space_air");
     	

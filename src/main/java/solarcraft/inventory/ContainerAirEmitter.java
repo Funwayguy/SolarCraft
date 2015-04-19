@@ -48,6 +48,7 @@ public class ContainerAirEmitter extends Container
             ICrafting icrafting = (ICrafting)this.crafters.get(i);
             
             icrafting.sendProgressBarUpdate(this, 0, this.airTile.airTime);
+            icrafting.sendProgressBarUpdate(this, 1, this.airTile.power);
         }
     }
 
@@ -58,6 +59,9 @@ public class ContainerAirEmitter extends Container
         if (id == 0)
         {
             this.airTile.airTime = number;
+        } else if(id == 1)
+        {
+        	this.airTile.power = number;
         }
     }
 	

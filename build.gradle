@@ -22,10 +22,11 @@ group= "solarcraft" // http://maven.apache.org/guides/mini/guide-naming-conventi
 archivesBaseName = "SolarCraft"
 
 minecraft {
-    version = "1.7.10-10.13.2.1230"
+    version = "1.7.10-10.13.2.1291"
 }
 
 dependencies {
+    compile files("dependecies/CoFHLib-[1.7.10]1.0.1-151-dev.jar")
 }
 
 processResources

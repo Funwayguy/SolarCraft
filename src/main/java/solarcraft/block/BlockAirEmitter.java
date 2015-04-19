@@ -1,5 +1,6 @@
 package solarcraft.block;
 
+import java.util.Random;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
@@ -41,6 +42,7 @@ public class BlockAirEmitter extends BlockContainer implements IAirProvider
         this.blockIcon = register.registerIcon("solarcraft:panel_emitter_side");
         this.iconTop = register.registerIcon("solarcraft:panel_emitter_top");
         this.iconBottom = register.registerIcon("solarcraft:panel_generic");
+		SolarCraft.LOX.setIcons(register.registerIcon("solarcraft:lox_still"), register.registerIcon("solarcraft:lox_flow"));
     }
 
     /**
@@ -77,5 +79,26 @@ public class BlockAirEmitter extends BlockContainer implements IAirProvider
 	public void setAirSupply(World world, int x, int y, int z, int amount)
 	{
 	}
-	
+
+    /**
+     * A randomly called display update to be able to add particles or other items for display
+     */
+    @SideOnly(Side.CLIENT)
+    public void randomDisplayTick(World world, int x, int y, int z, Random rand)
+    {
+    	if(rand.nextInt(5) == 0)
+    	{
+			TileEntity tile = world.getTileEntity(x, y, z);
+			
+			if(tile instanceof TileEntityAirEmitter && world.isBlockIndirectlyGettingPowered(x, y, z))
+			{
+				TileEntityAirEmitter airTile = (TileEntityAirEmitter)tile;
+				
+				if(airTile.airTime > 0 && airTile.power > 0)
+				{
+					world.spawnParticle("cloud", x + rand.nextDouble(), y + 1.5D, z + rand.nextDouble(), 0D, 0.5D, 0D);
+				}
+			}
+    	}
+    }
 }

@@ -2,12 +2,19 @@ package solarcraft.handlers;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityFlying;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.projectile.EntityFireball;
+import net.minecraft.entity.projectile.EntityLargeFireball;
+import net.minecraft.entity.projectile.EntitySmallFireball;
+import net.minecraft.pathfinding.PathPoint;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.MathHelper;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.terraingen.OreGenEvent.GenerateMinable;
+import solarcraft.EntitySpawnerFireball;
 import solarcraft.core.SC_Settings;
 import solarcraft.core.SolarCraft;
 import cpw.mods.fml.client.event.ConfigChangedEvent;
@@ -27,10 +34,12 @@ public class EventHandler
 		}
 	}
 	
+	long lastMeteor = 0L;
+	
 	@SubscribeEvent
 	public void onLivingUpdate(LivingUpdateEvent event)
 	{
-		if(event.entityLiving.dimension == 0 && !event.entityLiving.onGround && !(event.entityLiving instanceof EntityFlying) && !(event.entityLiving instanceof EntityPlayer && ((EntityPlayer)event.entityLiving).capabilities.isFlying))
+		if(event.entityLiving.dimension == 0 && !event.entityLiving.onGround && !(event.entityLiving.isInWater() || event.entityLiving.handleLavaMovement()) && !(event.entityLiving instanceof EntityFlying) && !(event.entityLiving instanceof EntityPlayer && ((EntityPlayer)event.entityLiving).capabilities.isFlying))
 		{
 			event.entityLiving.addVelocity(0D, 0.07D, 0D);
 			
@@ -57,6 +66,63 @@ public class EventHandler
 				event.entityLiving.attackEntityFrom(DamageSource.inWall, 2.0F);
 			}
 		}
+		
+		if(!event.entityLiving.worldObj.isRemote && event.entityLiving.worldObj.getTotalWorldTime() - lastMeteor >= (event.entityLiving.worldObj.isThundering()? 2 : 5) && event.entityLiving instanceof EntityPlayer)
+		{
+			lastMeteor = event.entityLiving.worldObj.getTotalWorldTime();
+			
+			if(event.entityLiving.worldObj.isRaining() && event.entityLiving.worldObj.provider.dimensionId == 0)
+			{
+				double spawnX = event.entityLiving.posX + (event.entityLiving.worldObj.rand.nextDouble() * 128D) - 64D;
+				double spawnZ = event.entityLiving.posZ + (event.entityLiving.worldObj.rand.nextDouble() * 128D) - 64D;
+				
+				EntityFireball fireball = null;
+				
+				if(event.entityLiving.getRNG().nextInt(100) == 0 && event.entityLiving.worldObj.isThundering())
+				{
+					fireball = new EntitySpawnerFireball(event.entityLiving.worldObj, spawnX, 255, spawnZ, 0.1D, -2D, 0.1D);
+				} else if(event.entityLiving.getRNG().nextInt(100) < 25)
+				{
+					fireball = new EntityLargeFireball(event.entityLiving.worldObj, spawnX, 255, spawnZ, 0.1D, -2D, 0.1D);
+				} else
+				{
+					fireball = new EntitySmallFireball(event.entityLiving.worldObj, spawnX, 255, spawnZ, 0.1D, -2D, 0.1D);
+				}
+				
+				event.entityLiving.worldObj.spawnEntityInWorld(fireball);
+			}
+		}
+		
+		if(!event.entityLiving.worldObj.isRemote && event.entityLiving instanceof EntityLiving && !event.entityLiving.onGround && event.entityLiving.worldObj.provider.dimensionId == 0)
+		{
+			EntityLiving entityLiving = (EntityLiving)event.entityLiving;
+			
+			double speed = entityLiving.getEntityAttribute(SharedMonsterAttributes.movementSpeed).getAttributeValue()/4D;
+			
+			if(entityLiving.getAttackTarget() != null)
+			{
+				double distX = entityLiving.getAttackTarget().posX - entityLiving.posX;
+				double distZ = entityLiving.getAttackTarget().posZ - entityLiving.posZ;
+				
+				entityLiving.setVelocity(MathHelper.clamp_double(entityLiving.motionX + distX, -speed, speed), entityLiving.motionY, MathHelper.clamp_double(entityLiving.motionZ + distZ, -speed, speed));
+				
+				if(!entityLiving.getNavigator().noPath())
+				{
+					entityLiving.getNavigator().clearPathEntity(); // If we don't clean out the path it will cause issues when we land somewhere other than the last pathing point
+				}
+			} else if(!entityLiving.getNavigator().noPath())
+			{
+				PathPoint point = entityLiving.getNavigator().getPath().getPathPointFromIndex(entityLiving.getNavigator().getPath().getCurrentPathIndex());
+				
+				if(point != null)
+				{
+					double distX = point.xCoord - entityLiving.posX;
+					double distZ = point.zCoord - entityLiving.posZ;
+					
+					entityLiving.setVelocity(MathHelper.clamp_double(entityLiving.motionX + distX, -speed, speed), entityLiving.motionY, MathHelper.clamp_double(entityLiving.motionZ + distZ, -speed, speed));
+				}
+			}
+		}
 	}
 	
 	@SubscribeEvent
@@ -75,7 +141,7 @@ public class EventHandler
 				
 				Entity entity = (Entity)entry;
 				
-				if(entity.dimension == 0 && !entity.onGround)
+				if(entity.dimension == 0 && !entity.onGround && !(entity.isInWater() || entity.handleLavaMovement()))
 				{
 					entity.motionY = MathHelper.clamp_double(entity.motionY, -3D, 3D); // Make sure entity isn't already too fast for ZeroG
 					entity.addVelocity(0D, 0.037D, 0D); // Give some upward velocity to counter a portion of gravity

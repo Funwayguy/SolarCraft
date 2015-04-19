@@ -1,8 +1,7 @@
 package solarcraft.block.tile;
 
 import java.util.ArrayList;
-import solarcraft.block.IAirProvider;
-import solarcraft.core.SolarCraft;
+import cofh.api.energy.IEnergyReceiver;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayer;
@@ -14,11 +13,19 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidTankInfo;
+import net.minecraftforge.fluids.IFluidHandler;
+import net.minecraftforge.fluids.IFluidTank;
+import solarcraft.block.IAirProvider;
+import solarcraft.core.SolarCraft;
 
-public class TileEntityAirEmitter extends TileEntity implements IInventory
+public class TileEntityAirEmitter extends TileEntity implements IInventory, IEnergyReceiver, IFluidTank, IFluidHandler
 {
 	ItemStack airInput;
 	public int airTime = 0;
+	public int power = 0;
 	static ArrayList<Material> validMats = new ArrayList<Material>();
 	
 	public TileEntityAirEmitter()
@@ -33,7 +40,12 @@ public class TileEntityAirEmitter extends TileEntity implements IInventory
 			return;
 		}
 		
-		if(airTime > 0)
+		// Calibration variables
+		int powerUse = 50;
+		int airUse = 10;
+		int rechargeCost = 1000;
+		
+		if(airTime >= airUse && power >= powerUse && this.worldObj.isBlockIndirectlyGettingPowered(this.xCoord, this.yCoord, this.zCoord))
 		{
 			if(airTime%10 == 0) // Culls a bit of the unnecessary processing
 			{
@@ -55,15 +67,16 @@ public class TileEntityAirEmitter extends TileEntity implements IInventory
 	        	}
 			}
 			
-			airTime -= 1;
+			airTime -= airUse;
+			power -= powerUse;
 			
-			if(airTime == 0)
+			if(airTime < airUse || power < powerUse)
 			{
 				this.worldObj.notifyBlocksOfNeighborChange(this.xCoord, this.yCoord, this.zCoord, SolarCraft.airEmitter);
 			}
 		}
 		
-		if(airTime <= 1 && this.getStackInSlot(0) != null && this.worldObj.isBlockIndirectlyGettingPowered(this.xCoord, this.yCoord, this.zCoord))
+		if(airTime <= airUse && this.getStackInSlot(0) != null && power >= rechargeCost)
 		{
 			ItemStack stack = this.getStackInSlot(0);
 			Item item = stack.getItem();
@@ -75,7 +88,8 @@ public class TileEntityAirEmitter extends TileEntity implements IInventory
 				if(validMats.contains(block.getMaterial()))
 				{
 					this.decrStackSize(0, 1);
-					airTime = 600;
+					airTime = this.getCapacity();
+					power -= rechargeCost;
 				}
 			}
 		}
@@ -204,5 +218,136 @@ public class TileEntityAirEmitter extends TileEntity implements IInventory
 		validMats.add(Material.leaves);
 		validMats.add(Material.cactus);
 		validMats.add(Material.vine);
+	}
+
+	@Override
+	public boolean canConnectEnergy(ForgeDirection side)
+	{
+		return side != ForgeDirection.UP;
+	}
+
+	@Override
+	public int getEnergyStored(ForgeDirection side)
+	{
+		return power;
+	}
+
+	@Override
+	public int getMaxEnergyStored(ForgeDirection side)
+	{
+		return 10000;
+	}
+
+	@Override
+	public int receiveEnergy(ForgeDirection side, int max, boolean simulate)
+	{
+		if(side == ForgeDirection.UP)
+		{
+			return 0;
+		}
+		
+		int change = Math.min(this.getMaxEnergyStored(side) - power, max);
+		
+		if(!simulate && change != 0)
+		{
+			power += change;
+		}
+		
+		return change;
+	}
+
+	@Override
+	public FluidStack getFluid()
+	{
+		if(airTime <= 0)
+		{
+			return null;
+		}
+		return new FluidStack(SolarCraft.LOX, airTime);
+	}
+
+	@Override
+	public int getFluidAmount()
+	{
+		return airTime;
+	}
+
+	@Override
+	public int getCapacity()
+	{
+		return 6000;
+	}
+
+	@Override
+	public FluidTankInfo getInfo()
+	{
+		return new FluidTankInfo(this);
+	}
+
+	@Override
+	public int fill(FluidStack resource, boolean doFill)
+	{
+		if(resource == null || resource.getFluid() != SolarCraft.LOX)
+		{
+			return 0;
+		}
+		
+		int change = Math.min(this.getCapacity() - airTime, resource.amount);
+		
+		if(doFill && change != 0)
+		{
+			airTime += change;
+		}
+		
+		return change;
+	}
+
+	@Override
+	public FluidStack drain(int maxDrain, boolean doDrain)
+	{
+		int change = Math.min(airTime, maxDrain);
+		
+		if(doDrain && change != 0)
+		{
+			airTime -= change;
+		}
+		
+		return change > 0? new FluidStack(SolarCraft.LOX, change) : null;
+	}
+
+	@Override
+	public int fill(ForgeDirection from, FluidStack resource, boolean doFill)
+	{
+		return (from == ForgeDirection.UP)? 0 : this.fill(resource, doFill);
+	}
+
+	@Override
+	public FluidStack drain(ForgeDirection from, FluidStack resource, boolean doDrain)
+	{
+		return (resource.getFluid() != SolarCraft.LOX)? null : this.drain(from, resource.amount, doDrain);
+	}
+
+	@Override
+	public FluidStack drain(ForgeDirection from, int maxDrain, boolean doDrain)
+	{
+		return (from == ForgeDirection.UP)? null : this.drain(maxDrain, doDrain);
+	}
+
+	@Override
+	public boolean canFill(ForgeDirection from, Fluid fluid)
+	{
+		return fluid == SolarCraft.LOX && !(from == ForgeDirection.UP);
+	}
+
+	@Override
+	public boolean canDrain(ForgeDirection from, Fluid fluid)
+	{
+		return fluid == SolarCraft.LOX && !(from == ForgeDirection.UP);
+	}
+
+	@Override
+	public FluidTankInfo[] getTankInfo(ForgeDirection from)
+	{
+		return new FluidTankInfo[]{this.getInfo()};
 	}
 }
