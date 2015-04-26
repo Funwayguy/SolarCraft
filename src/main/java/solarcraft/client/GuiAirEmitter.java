@@ -29,8 +29,8 @@ public class GuiAirEmitter extends GuiContainer
     {
         this.fontRendererObj.drawString(StatCollector.translateToLocalFormatted("container.inventory", new Object[0]), 8, this.ySize - 96 + 2, 4210752);
         String oxygenTxt = StatCollector.translateToLocalFormatted("fluid.oxygen");
-        this.fontRendererObj.drawString(oxygenTxt, 48 - this.fontRendererObj.getStringWidth(oxygenTxt)/2, 24, 4210752);
-        this.fontRendererObj.drawString("RF", 128 - this.fontRendererObj.getStringWidth("RF")/2, 24, 4210752);
+        this.fontRendererObj.drawString(oxygenTxt, 36, 24, 4210752);
+        this.fontRendererObj.drawString("RF", 116, 24, 4210752);
         
         if(isWithin(mx, my, 16, 40, 64, 16))
         {

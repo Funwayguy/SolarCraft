@@ -1,5 +1,6 @@
 package solarcraft.inventory;
 
+import cofh.api.energy.IEnergyContainerItem;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import solarcraft.block.tile.TileEntityAirEmitter;
@@ -17,7 +18,18 @@ public class ContainerAirEmitter extends Container
 	{
 		this.airTile = tile;
 		
-		this.addSlotToContainer(new Slot(tile, 0, 80, 16));
+		this.addSlotToContainer(new Slot(tile, 0, 16, 16));
+		this.addSlotToContainer(new Slot(tile, 1, 96, 16)
+		{
+		    /**
+		     * Check if the stack is a valid item for this slot. Always true beside for the armor slots.
+		     */
+			@Override
+		    public boolean isItemValid(ItemStack stack)
+		    {
+		        return stack != null && stack.getItem() != null && stack.getItem() instanceof IEnergyContainerItem;
+		    }
+		});
 		
         int i;
 
@@ -86,7 +98,7 @@ public class ContainerAirEmitter extends Container
 
             if (index < 1)
             {
-                if (!this.mergeItemStack(itemstack1, 1, 37, true))
+                if (!this.mergeItemStack(itemstack1, 2, 38, true))
                 {
                     return null;
                 }

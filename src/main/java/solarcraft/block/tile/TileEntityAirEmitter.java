@@ -1,12 +1,12 @@
 package solarcraft.block.tile;
 
 import java.util.ArrayList;
-import cofh.api.energy.IEnergyReceiver;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
@@ -19,11 +19,14 @@ import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidHandler;
 import net.minecraftforge.fluids.IFluidTank;
 import solarcraft.block.IAirProvider;
+import solarcraft.core.SC_Settings;
 import solarcraft.core.SolarCraft;
+import cofh.api.energy.IEnergyContainerItem;
+import cofh.api.energy.IEnergyReceiver;
 
-public class TileEntityAirEmitter extends TileEntity implements IInventory, IEnergyReceiver, IFluidTank, IFluidHandler
+public class TileEntityAirEmitter extends TileEntity implements IInventory, IEnergyReceiver, IFluidTank, IFluidHandler, ISidedInventory
 {
-	ItemStack airInput;
+	ItemStack[] itemStacks = new ItemStack[2];
 	public int airTime = 0;
 	public int power = 0;
 	static ArrayList<Material> validMats = new ArrayList<Material>();
@@ -40,15 +43,13 @@ public class TileEntityAirEmitter extends TileEntity implements IInventory, IEne
 			return;
 		}
 		
-		// Calibration variables
-		int powerUse = 50;
-		int airUse = 10;
-		int rechargeCost = 1000;
-		
-		if(airTime >= airUse && power >= powerUse && this.worldObj.isBlockIndirectlyGettingPowered(this.xCoord, this.yCoord, this.zCoord))
+		if(airTime >= SC_Settings.machineUsage && power >= SC_Settings.machineUsage && this.worldObj.isBlockIndirectlyGettingPowered(this.xCoord, this.yCoord, this.zCoord))
 		{
-			if(airTime%10 == 0) // Culls a bit of the unnecessary processing
+			if(this.getWorldObj().getTotalWorldTime()%10 == 0) // Culls a bit of the unnecessary processing
 			{
+				FluidStack airFluid = this.drain(SC_Settings.machineUsage * 16, false);
+				int airUsed = airFluid != null && airFluid.amount >= SC_Settings.machineUsage? airFluid.amount/SC_Settings.machineUsage : 1;
+				
 				for(ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS)
 	        	{
 	        		int dx = this.xCoord + dir.offsetX;
@@ -59,24 +60,23 @@ public class TileEntityAirEmitter extends TileEntity implements IInventory, IEne
 	        		
 	        		if(block == Blocks.air)
 	        		{
-	        			worldObj.setBlock(dx, dy, dz, SolarCraft.spaceAir, 15, 3);
+	        			worldObj.setBlock(dx, dy, dz, SolarCraft.spaceAir, airUsed - 1, 3);
 	        		} else if(block instanceof IAirProvider)
 	        		{
-	        			((IAirProvider)block).setAirSupply(this.worldObj, this.xCoord, this.yCoord, this.zCoord, 15);
+	        			((IAirProvider)block).setAirSupply(this.worldObj, dx, dy, dz, airUsed);
 	        		}
 	        	}
 			}
 			
-			airTime -= airUse;
-			power -= powerUse;
+			this.drain(SC_Settings.machineUsage, true);
 			
-			if(airTime < airUse || power < powerUse)
+			if(airTime < SC_Settings.machineUsage || power < SC_Settings.machineUsage)
 			{
 				this.worldObj.notifyBlocksOfNeighborChange(this.xCoord, this.yCoord, this.zCoord, SolarCraft.airEmitter);
 			}
 		}
 		
-		if(airTime <= airUse && this.getStackInSlot(0) != null && power >= rechargeCost)
+		if(airTime <= SC_Settings.machineUsage && this.getStackInSlot(0) != null && power >= SC_Settings.machineUsage*20)
 		{
 			ItemStack stack = this.getStackInSlot(0);
 			Item item = stack.getItem();
@@ -89,8 +89,18 @@ public class TileEntityAirEmitter extends TileEntity implements IInventory, IEne
 				{
 					this.decrStackSize(0, 1);
 					airTime = this.getCapacity();
-					power -= rechargeCost;
+					power -= SC_Settings.machineUsage*20;
 				}
+			}
+		}
+		
+		if(power < this.getMaxEnergyStored(ForgeDirection.NORTH) && this.getStackInSlot(1) != null)
+		{
+			ItemStack stack = this.getStackInSlot(1);
+			
+			if(stack.getItem() instanceof IEnergyContainerItem)
+			{
+				power += ((IEnergyContainerItem)stack.getItem()).extractEnergy(stack, this.getMaxEnergyStored(ForgeDirection.NORTH) - power, false);
 			}
 		}
 	}
@@ -99,7 +109,9 @@ public class TileEntityAirEmitter extends TileEntity implements IInventory, IEne
     public void readFromNBT(NBTTagCompound tags)
     {
     	super.readFromNBT(tags);
-    	airInput = ItemStack.loadItemStackFromNBT(tags.getCompoundTag("AirInput"));
+    	itemStacks = new ItemStack[2];
+    	itemStacks[0] = ItemStack.loadItemStackFromNBT(tags.getCompoundTag("AirInput"));
+    	itemStacks[1] = ItemStack.loadItemStackFromNBT(tags.getCompoundTag("RFInput"));
     	airTime = tags.getInteger("airTime");
     }
 	
@@ -109,44 +121,51 @@ public class TileEntityAirEmitter extends TileEntity implements IInventory, IEne
     	super.writeToNBT(tags);
     	tags.setInteger("airTime", airTime);
     	
-    	if(airInput != null)
+    	if(itemStacks[0] != null)
     	{
     		NBTTagCompound stackTags = new NBTTagCompound();
-    		stackTags = airInput.writeToNBT(stackTags);
+    		stackTags = itemStacks[0].writeToNBT(stackTags);
     		tags.setTag("AirInput", stackTags);
+    	}
+    	
+    	if(itemStacks[1] != null)
+    	{
+    		NBTTagCompound stackTags = new NBTTagCompound();
+    		stackTags = itemStacks[1].writeToNBT(stackTags);
+    		tags.setTag("RFInput", stackTags);
     	}
     }
 
 	@Override
 	public int getSizeInventory()
 	{
-		return 1;
+		return 2;
 	}
 
 	@Override
 	public ItemStack getStackInSlot(int slot)
 	{
-		return slot == 0? airInput : null;
+		return slot >= 0 && slot < itemStacks.length? itemStacks[slot] : null;
 	}
 
 	@Override
 	public ItemStack decrStackSize(int slot, int amount)
 	{
-		if(slot == 0 && airInput != null)
+		if(slot >= 0 && slot < itemStacks.length && itemStacks[slot] != null)
 		{
-			if(airInput.stackSize <= amount)
+			if(itemStacks[slot].stackSize <= amount)
 			{
-				ItemStack item = airInput;
-				airInput = null;
+				ItemStack item = itemStacks[slot];
+				itemStacks[slot] = null;
 				this.markDirty();
 				return item;
 			} else
 			{
-				ItemStack item = airInput.splitStack(amount);
+				ItemStack item = itemStacks[slot].splitStack(amount);
 				
-				if(airInput.stackSize <= 0)
+				if(itemStacks[slot].stackSize <= 0)
 				{
-					airInput = null;
+					itemStacks[slot] = null;
 				}
 				this.markDirty();
 				return item;
@@ -158,15 +177,15 @@ public class TileEntityAirEmitter extends TileEntity implements IInventory, IEne
 	@Override
 	public ItemStack getStackInSlotOnClosing(int slot)
 	{
-		return slot == 0? airInput : null;
+		return slot >= 0 && slot < itemStacks.length? itemStacks[slot] : null;
 	}
 
 	@Override
 	public void setInventorySlotContents(int slot, ItemStack stack)
 	{
-		if(slot == 0)
+		if(slot >= 0 && slot < itemStacks.length)
 		{
-			airInput = stack;
+			itemStacks[slot] = stack;
 		}
 		this.markDirty();
 	}
@@ -235,7 +254,7 @@ public class TileEntityAirEmitter extends TileEntity implements IInventory, IEne
 	@Override
 	public int getMaxEnergyStored(ForgeDirection side)
 	{
-		return 10000;
+		return 25000;
 	}
 
 	@Override
@@ -305,11 +324,12 @@ public class TileEntityAirEmitter extends TileEntity implements IInventory, IEne
 	@Override
 	public FluidStack drain(int maxDrain, boolean doDrain)
 	{
-		int change = Math.min(airTime, maxDrain);
+		int change = Math.min(airTime, Math.min(maxDrain, this.power));
 		
 		if(doDrain && change != 0)
 		{
 			airTime -= change;
+			power -= change;
 		}
 		
 		return change > 0? new FluidStack(SolarCraft.LOX, change) : null;
@@ -318,7 +338,7 @@ public class TileEntityAirEmitter extends TileEntity implements IInventory, IEne
 	@Override
 	public int fill(ForgeDirection from, FluidStack resource, boolean doFill)
 	{
-		return (from == ForgeDirection.UP)? 0 : this.fill(resource, doFill);
+		return this.fill(resource, doFill);
 	}
 
 	@Override
@@ -330,24 +350,42 @@ public class TileEntityAirEmitter extends TileEntity implements IInventory, IEne
 	@Override
 	public FluidStack drain(ForgeDirection from, int maxDrain, boolean doDrain)
 	{
-		return (from == ForgeDirection.UP)? null : this.drain(maxDrain, doDrain);
+		return this.drain(maxDrain, doDrain);
 	}
 
 	@Override
 	public boolean canFill(ForgeDirection from, Fluid fluid)
 	{
-		return fluid == SolarCraft.LOX && !(from == ForgeDirection.UP);
+		return fluid == SolarCraft.LOX;
 	}
 
 	@Override
 	public boolean canDrain(ForgeDirection from, Fluid fluid)
 	{
-		return fluid == SolarCraft.LOX && !(from == ForgeDirection.UP);
+		return fluid == SolarCraft.LOX;
 	}
 
 	@Override
 	public FluidTankInfo[] getTankInfo(ForgeDirection from)
 	{
 		return new FluidTankInfo[]{this.getInfo()};
+	}
+
+	@Override
+	public int[] getAccessibleSlotsFromSide(int side)
+	{
+		return new int[]{0};
+	}
+
+	@Override
+	public boolean canInsertItem(int slot, ItemStack stack, int side)
+	{
+		return slot == 0;
+	}
+
+	@Override
+	public boolean canExtractItem(int slot, ItemStack stack, int side)
+	{
+		return slot == 0;
 	}
 }

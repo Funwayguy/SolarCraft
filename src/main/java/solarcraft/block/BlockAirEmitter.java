@@ -9,7 +9,9 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
+import net.minecraftforge.fluids.FluidStack;
 import solarcraft.block.tile.TileEntityAirEmitter;
+import solarcraft.core.SC_Settings;
 import solarcraft.core.SolarCraft;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -42,7 +44,6 @@ public class BlockAirEmitter extends BlockContainer implements IAirProvider
         this.blockIcon = register.registerIcon("solarcraft:panel_emitter_side");
         this.iconTop = register.registerIcon("solarcraft:panel_emitter_top");
         this.iconBottom = register.registerIcon("solarcraft:panel_generic");
-		SolarCraft.LOX.setIcons(register.registerIcon("solarcraft:lox_still"), register.registerIcon("solarcraft:lox_flow"));
     }
 
     /**
@@ -66,9 +67,10 @@ public class BlockAirEmitter extends BlockContainer implements IAirProvider
 	{
 		TileEntity tile = world.getTileEntity(x, y, z);
 		
-		if(tile instanceof TileEntityAirEmitter)
+		if(tile instanceof TileEntityAirEmitter && world.isBlockIndirectlyGettingPowered(x, y, z))
 		{
-			return ((TileEntityAirEmitter)tile).airTime > 0? 16 : 0;
+			FluidStack airFluid = ((TileEntityAirEmitter)tile).drain(SC_Settings.machineUsage*16, false);
+			return airFluid != null? airFluid.amount/SC_Settings.machineUsage : 0;
 		} else
 		{
 			return 0;
@@ -94,7 +96,7 @@ public class BlockAirEmitter extends BlockContainer implements IAirProvider
 			{
 				TileEntityAirEmitter airTile = (TileEntityAirEmitter)tile;
 				
-				if(airTile.airTime > 0 && airTile.power > 0)
+				if(airTile.airTime >= 10 && airTile.power > 0)
 				{
 					world.spawnParticle("cloud", x + rand.nextDouble(), y + 1.5D, z + rand.nextDouble(), 0D, 0.5D, 0D);
 				}

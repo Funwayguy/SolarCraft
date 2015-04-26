@@ -2,23 +2,26 @@ package solarcraft.block;
 
 import java.util.Random;
 import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
+import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MathHelper;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import solarcraft.core.SC_Settings;
 import solarcraft.core.SolarCraft;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 public class BlockSpaceAir extends Block implements IAirProvider
 {
     public BlockSpaceAir()
     {
-        super(Material.air);
+        super(SolarCraft.gas);
         this.setTickRandomly(true);
         this.setBlockName("solarcraft.space_air");
-		this.setBlockTextureName("glass");
+		this.setBlockTextureName("solarcraft:lox_still");
     }
     
     /**
@@ -36,6 +39,11 @@ public class BlockSpaceAir extends Block implements IAirProvider
     public void onBlockAdded(World world, int x, int y, int z)
     {
     	super.onBlockAdded(world, x, y, z);
+    	
+    	if(world.isRemote)
+    	{
+    		return;
+    	}
     	
     	if(SC_Settings.airInterval > 0)
     	{
@@ -55,6 +63,11 @@ public class BlockSpaceAir extends Block implements IAirProvider
     @Override
     public void updateTick(World world, int x, int y, int z, Random rand)
     {
+    	if(world.isRemote)
+    	{
+    		return;
+    	}
+    	
     	int curAir = this.getAirSupply(world, x, y, z);
     	int maxNear = 0;
     	
@@ -96,10 +109,26 @@ public class BlockSpaceAir extends Block implements IAirProvider
         		
         		if(block == Blocks.air)
         		{
-        			world.setBlock(dx, dy, dz, SolarCraft.spaceAir, curAir - 1, 2);
+        			world.setBlock(dx, dy, dz, SolarCraft.spaceAir, curAir - 2, 2);
         		}
         	}
 		}
+    }
+
+    @SideOnly(Side.CLIENT)
+    public void registerBlockIcons(IIconRegister register)
+    {
+    	super.registerBlockIcons(register);
+		SolarCraft.LOX.setIcons(this.blockIcon, register.registerIcon("solarcraft:lox_flow"));
+    }
+
+    /**
+     * Returns which pass should this block be rendered on. 0 for solids and 1 for alpha
+     */
+    @SideOnly(Side.CLIENT)
+    public int getRenderBlockPass()
+    {
+        return 1;
     }
 
     /**
@@ -108,6 +137,18 @@ public class BlockSpaceAir extends Block implements IAirProvider
     public int getRenderType()
     {
         return SC_Settings.debugAir? 0 : -1;
+    }
+
+    /**
+     * Returns true if the given side of this block type should be rendered, if the adjacent block is at the given
+     * coordinates.  Args: blockAccess, x, y, z, side
+     */
+    @SideOnly(Side.CLIENT)
+    public boolean shouldSideBeRendered(IBlockAccess blockAccess, int x, int y, int z, int side)
+    {
+    	Block block = blockAccess.getBlock(x, y, z);
+    	
+    	return !block.getMaterial().isSolid() && block != this;
     }
 
     /**
@@ -152,6 +193,11 @@ public class BlockSpaceAir extends Block implements IAirProvider
     @Override
     public void onNeighborBlockChange(World world, int x, int y, int z, Block block)
     {
+    	if(world.isRemote)
+    	{
+    		return;
+    	}
+    	
     	if(SC_Settings.airInterval > 0)
     	{
     		world.scheduleBlockUpdate(x, y, z, this, this.tickRate(world));
@@ -167,6 +213,11 @@ public class BlockSpaceAir extends Block implements IAirProvider
 	@Override
 	public void setAirSupply(World world, int x, int y, int z, int amount)
 	{
+    	if(world.isRemote)
+    	{
+    		return;
+    	}
+    	
 		amount = MathHelper.clamp_int(amount, 0, 16);
 		
 		if(amount <= 0)
@@ -174,7 +225,6 @@ public class BlockSpaceAir extends Block implements IAirProvider
 			world.setBlockToAir(x, y, z);
 		} else
 		{
-			//world.setBlock(x, y, z, SolarCraft.spaceAir, amount - 1, 3);
 			world.setBlockMetadataWithNotify(x, y, z, amount - 1, 3);
 			if(SC_Settings.airInterval > 0)
 	    	{

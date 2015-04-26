@@ -1,3 +1,4 @@
 tile.solarcraft.air_emitter.name=Air Emitter
-gui.solarcraft.air=Air: %s
+tile.solarcraft.space_air.name=Oxygen Block
+tile.solarcraft.air_vent.name=Air Vent
 fluid.oxygen=Oxygen
