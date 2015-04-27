@@ -9,6 +9,7 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
+import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import solarcraft.block.tile.TileEntityAirVent;
@@ -49,9 +50,9 @@ public class BlockAirVent extends Block implements ITileEntityProvider, IAirProv
 	{
 		TileEntity tile = world.getTileEntity(x, y, z);
 		
-		if(tile != null && tile instanceof TileEntityAirVent)
+		if(tile != null && tile instanceof TileEntityAirVent && tile.blockMetadata == 0)
 		{
-			return ((TileEntityAirVent)tile).airBuffer/SC_Settings.machineUsage;
+			return MathHelper.clamp_int(((TileEntityAirVent)tile).airBuffer/SC_Settings.machineUsage, 1, 16);
 		}
 		
 		return 0;
@@ -79,11 +80,8 @@ public class BlockAirVent extends Block implements ITileEntityProvider, IAirProv
 			return true;
 		}
 		
-		TileEntity tile = world.getTileEntity(x, y, z);
 		world.setBlockMetadataWithNotify(x, y, z, world.getBlockMetadata(x, y, z) == 0? 1 : 0, 3);
-		tile.blockMetadata = world.getBlockMetadata(x, y, z);
-		tile.validate();
-		world.setTileEntity(x, y, z, tile);
+		
 		return true;
     }
 

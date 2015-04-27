@@ -7,6 +7,7 @@ import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.MathHelper;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
@@ -37,12 +38,14 @@ public class TileEntityAirVent extends TileEntity implements IFluidHandler
 	        		
 	        		Block block = worldObj.getBlock(dx, dy, dz);
 	        		
+	        		int airOut = MathHelper.clamp_int(airBuffer/SC_Settings.machineUsage, 1, 16);
+	        		
 	        		if(block == Blocks.air)
 	        		{
-	        			worldObj.setBlock(dx, dy, dz, SolarCraft.spaceAir, this.airBuffer/SC_Settings.machineUsage - 1, 3);
+	        			worldObj.setBlock(dx, dy, dz, SolarCraft.spaceAir, airOut - 1, 3);
 	        		} else if(block instanceof IAirProvider)
 	        		{
-	        			((IAirProvider)block).setAirSupply(this.worldObj, dx, dy, dz, this.airBuffer/SC_Settings.machineUsage);
+	        			((IAirProvider)block).setAirSupply(this.worldObj, dx, dy, dz, airOut);
 	        		}
 	        	}
 			}
@@ -79,7 +82,7 @@ public class TileEntityAirVent extends TileEntity implements IFluidHandler
 			return 0;
 		}
 		
-		int change = Math.min(resource.amount, (SC_Settings.machineUsage*16) - this.airBuffer);
+		int change = Math.min(resource.amount, (SC_Settings.machineUsage*32) - this.airBuffer);
 		
 		if(doFill && change != 0)
 		{
@@ -116,6 +119,6 @@ public class TileEntityAirVent extends TileEntity implements IFluidHandler
 	@Override
 	public FluidTankInfo[] getTankInfo(ForgeDirection from)
 	{
-		return new FluidTankInfo[]{new FluidTankInfo(this.airBuffer > 0? new FluidStack(SolarCraft.LOX, this.airBuffer) : null, (SC_Settings.machineUsage*16))};
+		return new FluidTankInfo[]{new FluidTankInfo(this.airBuffer > 0? new FluidStack(SolarCraft.LOX, this.airBuffer) : null, (SC_Settings.machineUsage*32))};
 	}
 }
