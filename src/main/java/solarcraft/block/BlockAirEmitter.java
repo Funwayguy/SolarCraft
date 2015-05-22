@@ -69,7 +69,7 @@ public class BlockAirEmitter extends BlockContainer implements IAirProvider
 		
 		if(tile instanceof TileEntityAirEmitter && world.isBlockIndirectlyGettingPowered(x, y, z))
 		{
-			FluidStack airFluid = ((TileEntityAirEmitter)tile).drain(SC_Settings.machineUsage*16, false);
+			FluidStack airFluid = ((TileEntityAirEmitter)tile).drain(16, false);
 			return airFluid != null? airFluid.amount/SC_Settings.machineUsage : 0;
 		} else
 		{

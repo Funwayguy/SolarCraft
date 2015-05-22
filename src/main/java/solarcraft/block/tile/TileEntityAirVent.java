@@ -26,7 +26,7 @@ public class TileEntityAirVent extends TileEntity implements IFluidHandler
 			return;
 		}
 		
-		if(airBuffer >= SC_Settings.machineUsage && this.blockMetadata == 0)
+		if(airBuffer >= SC_Settings.machineUsage && this.getBlockMetadata() == 0)
 		{
 			if(this.getWorldObj().getTotalWorldTime()%10 == 0) // Culls a bit of the unnecessary processing
 			{
@@ -38,24 +38,26 @@ public class TileEntityAirVent extends TileEntity implements IFluidHandler
 	        		
 	        		Block block = worldObj.getBlock(dx, dy, dz);
 	        		
-	        		int airOut = MathHelper.clamp_int(airBuffer/SC_Settings.machineUsage, 1, 16);
+	        		int airOut = MathHelper.clamp_int(airBuffer, 1, 16);
 	        		
 	        		if(block == Blocks.air)
 	        		{
 	        			worldObj.setBlock(dx, dy, dz, SolarCraft.spaceAir, airOut - 1, 3);
 	        		} else if(block instanceof IAirProvider)
 	        		{
-	        			((IAirProvider)block).setAirSupply(this.worldObj, dx, dy, dz, airOut);
+	        			IAirProvider airTile = (IAirProvider)block;
+	        			
+	        			if(airTile.getAirSupply(this.worldObj, dx, dy, dz) != airOut)
+	        			{
+	        				airTile.setAirSupply(this.worldObj, dx, dy, dz, airOut);
+	        			}
 	        		}
 	        	}
 			}
 			
 			airBuffer -= SC_Settings.machineUsage;
 			
-			if(airBuffer < SC_Settings.machineUsage)
-			{
-				this.worldObj.notifyBlocksOfNeighborChange(this.xCoord, this.yCoord, this.zCoord, SolarCraft.airVent);
-			}
+			this.worldObj.notifyBlocksOfNeighborChange(this.xCoord, this.yCoord, this.zCoord, SolarCraft.airVent);
 		}
 	}
 		
@@ -119,6 +121,6 @@ public class TileEntityAirVent extends TileEntity implements IFluidHandler
 	@Override
 	public FluidTankInfo[] getTankInfo(ForgeDirection from)
 	{
-		return new FluidTankInfo[]{new FluidTankInfo(this.airBuffer > 0? new FluidStack(SolarCraft.LOX, this.airBuffer) : null, (SC_Settings.machineUsage*32))};
+		return new FluidTankInfo[]{new FluidTankInfo(this.airBuffer > 0? new FluidStack(SolarCraft.LOX, this.airBuffer) : null, (SC_Settings.machineUsage*16))};
 	}
 }

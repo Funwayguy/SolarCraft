@@ -79,11 +79,7 @@ public class BlockSpaceAir extends Block implements IAirProvider
     		
     		Block block = world.getBlock(dx, dy, dz);
     		
-    		if(block == Blocks.leaves || block == Blocks.leaves2)
-    		{
-    			maxNear = 16;
-    			break;
-    		} else if(block instanceof IAirProvider)
+    		if(block instanceof IAirProvider)
     		{
     			int tmpAir = ((IAirProvider)block).getAirSupply(world, dx, dy, dz);
     			

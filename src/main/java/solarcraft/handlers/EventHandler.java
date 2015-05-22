@@ -67,7 +67,7 @@ public class EventHandler
 			}
 		}
 		
-		if(!event.entityLiving.worldObj.isRemote && event.entityLiving.worldObj.getTotalWorldTime() - lastMeteor >= (event.entityLiving.worldObj.isThundering()? 2 : 5) && event.entityLiving instanceof EntityPlayer)
+		if(SC_Settings.meteorShowers && !event.entityLiving.worldObj.isRemote && event.entityLiving.worldObj.getTotalWorldTime() - lastMeteor >= (event.entityLiving.worldObj.isThundering()? 2 : 5) && event.entityLiving instanceof EntityPlayer)
 		{
 			lastMeteor = event.entityLiving.worldObj.getTotalWorldTime();
 			

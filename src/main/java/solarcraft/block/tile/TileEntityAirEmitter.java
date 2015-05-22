@@ -47,9 +47,6 @@ public class TileEntityAirEmitter extends TileEntity implements IInventory, IEne
 		{
 			if(this.getWorldObj().getTotalWorldTime()%10 == 0) // Culls a bit of the unnecessary processing
 			{
-				FluidStack airFluid = this.drain(SC_Settings.machineUsage * 16, false);
-				int airUsed = airFluid != null && airFluid.amount >= SC_Settings.machineUsage? airFluid.amount/SC_Settings.machineUsage : 1;
-				
 				for(ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS)
 	        	{
 	        		int dx = this.xCoord + dir.offsetX;
@@ -60,10 +57,10 @@ public class TileEntityAirEmitter extends TileEntity implements IInventory, IEne
 	        		
 	        		if(block == Blocks.air)
 	        		{
-	        			worldObj.setBlock(dx, dy, dz, SolarCraft.spaceAir, airUsed - 1, 3);
+	        			worldObj.setBlock(dx, dy, dz, SolarCraft.spaceAir, 15, 3);
 	        		} else if(block instanceof IAirProvider)
 	        		{
-	        			((IAirProvider)block).setAirSupply(this.worldObj, dx, dy, dz, airUsed);
+	        			((IAirProvider)block).setAirSupply(this.worldObj, dx, dy, dz, 16);
 	        		}
 	        	}
 			}
