@@ -9,7 +9,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
-import net.minecraftforge.fluids.FluidStack;
 import solarcraft.block.tile.TileEntityAirEmitter;
 import solarcraft.core.SC_Settings;
 import solarcraft.core.SolarCraft;
@@ -69,8 +68,8 @@ public class BlockAirEmitter extends BlockContainer implements IAirProvider
 		
 		if(tile instanceof TileEntityAirEmitter && world.isBlockIndirectlyGettingPowered(x, y, z))
 		{
-			FluidStack airFluid = ((TileEntityAirEmitter)tile).drain(16, false);
-			return airFluid != null? airFluid.amount/SC_Settings.machineUsage : 0;
+			TileEntityAirEmitter emitter = (TileEntityAirEmitter)tile;
+			return emitter.airTime >= SC_Settings.machineUsage && emitter.power >= SC_Settings.machineUsage? 16 : 0;
 		} else
 		{
 			return 0;

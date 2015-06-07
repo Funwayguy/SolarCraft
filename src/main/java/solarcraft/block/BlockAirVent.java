@@ -13,6 +13,7 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import solarcraft.block.tile.TileEntityAirVent;
+import solarcraft.core.SC_Settings;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -51,7 +52,15 @@ public class BlockAirVent extends Block implements ITileEntityProvider, IAirProv
 		
 		if(tile != null && tile instanceof TileEntityAirVent && tile.getBlockMetadata() == 0)
 		{
-			return MathHelper.clamp_int(((TileEntityAirVent)tile).airBuffer, 1, 16);
+			TileEntityAirVent vent = (TileEntityAirVent)tile;
+			if(vent.airBuffer >= SC_Settings.machineUsage)
+			{
+				int value = MathHelper.clamp_int(vent.airBuffer/SC_Settings.machineUsage, 1, 16);
+				return value;
+			} else
+			{
+				return 0;
+			}
 		}
 		
 		return 0;

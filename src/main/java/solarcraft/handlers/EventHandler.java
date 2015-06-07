@@ -15,6 +15,7 @@ import net.minecraft.util.MathHelper;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.terraingen.OreGenEvent.GenerateMinable;
 import solarcraft.EntitySpawnerFireball;
+import solarcraft.block.BlockSpaceAir;
 import solarcraft.core.SC_Settings;
 import solarcraft.core.SolarCraft;
 import cpw.mods.fml.client.event.ConfigChangedEvent;
@@ -125,11 +126,20 @@ public class EventHandler
 		}
 	}
 	
+	int tps = 0;
+	
 	@SubscribeEvent
 	public void onTickEvent(TickEvent.WorldTickEvent event)
 	{
 		if(event.phase == TickEvent.Phase.START)
 		{
+			tps = (tps + 1)%5;
+			
+			if(tps == 0)
+			{
+				BlockSpaceAir.tps = 0;
+			}
+			
 			for(int i = event.world.loadedEntityList.size() - 1; i >= 0; i--)
 			{
 				Object entry = event.world.loadedEntityList.get(i);

@@ -54,7 +54,8 @@ public class SolarCraft
 	public static Logger logger;
 	
 	public static BiomeGenBase spaceBiome;
-	public static Block spaceAir;
+	public static BlockSpaceAir spaceAir;
+	public static BlockSpaceAir spaceAirDecay;
 	public static Block airEmitter;
 	public static Block airVent;
 	
@@ -85,8 +86,11 @@ public class SolarCraft
     	FluidRegistry.registerFluid(LOX);
     	
     	spaceAir = new BlockSpaceAir();
+    	spaceAirDecay = new BlockSpaceAir().setDecay();
     	GameRegistry.registerBlock(spaceAir, "space_air");
+    	GameRegistry.registerBlock(spaceAirDecay, "space_air_decay");
 		Blocks.fire.setFireInfo(spaceAir, 10, 10);
+		Blocks.fire.setFireInfo(spaceAirDecay, 10, 10);
     	
     	airEmitter = new BlockAirEmitter();
     	GameRegistry.registerBlock(airEmitter, "air_emitter");

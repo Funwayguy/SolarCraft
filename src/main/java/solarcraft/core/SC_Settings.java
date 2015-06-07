@@ -19,7 +19,6 @@ public class SC_Settings
 	public static float spawnIsland = 24F;
 	public static int scorchedBoundry = 16;
 	public static String[] cakeLayers = new String[]{Block.blockRegistry.getNameForObject(Blocks.stained_hardened_clay) + ":15"};
-	public static int airInterval = 10;
 	public static boolean meteorShowers = true;
 	public static int machineUsage = 10;
 }

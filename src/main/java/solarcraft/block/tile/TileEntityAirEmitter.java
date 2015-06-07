@@ -57,10 +57,10 @@ public class TileEntityAirEmitter extends TileEntity implements IInventory, IEne
 	        		
 	        		if(block == Blocks.air)
 	        		{
-	        			worldObj.setBlock(dx, dy, dz, SolarCraft.spaceAir, 15, 3);
+	        			worldObj.setBlock(dx, dy, dz, SolarCraft.spaceAir, 14, 3);
 	        		} else if(block instanceof IAirProvider)
 	        		{
-	        			((IAirProvider)block).setAirSupply(this.worldObj, dx, dy, dz, 16);
+	        			((IAirProvider)block).setAirSupply(this.worldObj, dx, dy, dz, 15);
 	        		}
 	        	}
 			}

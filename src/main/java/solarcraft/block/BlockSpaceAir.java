@@ -16,12 +16,21 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 public class BlockSpaceAir extends Block implements IAirProvider
 {
+	public static int tps = 0;
+	public boolean isDecay = false;
+	
     public BlockSpaceAir()
     {
         super(SolarCraft.gas);
         this.setTickRandomly(true);
         this.setBlockName("solarcraft.space_air");
 		this.setBlockTextureName("solarcraft:lox_still");
+    }
+    
+    public BlockSpaceAir setDecay()
+    {
+    	isDecay = true;
+    	return this;
     }
     
     /**
@@ -45,10 +54,7 @@ public class BlockSpaceAir extends Block implements IAirProvider
     		return;
     	}
     	
-    	if(SC_Settings.airInterval > 0)
-    	{
-    		world.scheduleBlockUpdate(x, y, z, this, this.tickRate(world));
-    	}
+    	world.scheduleBlockUpdate(x, y, z, this, this.tickRate(world));
     }
     
     /**
@@ -57,7 +63,7 @@ public class BlockSpaceAir extends Block implements IAirProvider
     @Override
     public int tickRate(World world)
     {
-        return SC_Settings.airInterval;
+        return 20 + world.rand.nextInt(10);
     }
     
     @Override
@@ -66,7 +72,13 @@ public class BlockSpaceAir extends Block implements IAirProvider
     	if(world.isRemote)
     	{
     		return;
+    	} else if(tps >= 20)
+    	{
+        	world.scheduleBlockUpdate(x, y, z, this, this.tickRate(world));
+    		return;
     	}
+    	
+    	tps++;
     	
     	int curAir = this.getAirSupply(world, x, y, z);
     	int maxNear = 0;
@@ -79,7 +91,11 @@ public class BlockSpaceAir extends Block implements IAirProvider
     		
     		Block block = world.getBlock(dx, dy, dz);
     		
-    		if(block instanceof IAirProvider)
+    		if(block == SolarCraft.spaceAirDecay && SolarCraft.spaceAirDecay.getAirSupply(world, dx, dy, dz) > curAir)
+    		{
+    			world.setBlock(x, y, z, SolarCraft.spaceAirDecay);
+    			return;
+    		} else if(block instanceof IAirProvider)
     		{
     			int tmpAir = ((IAirProvider)block).getAirSupply(world, dx, dy, dz);
     			
@@ -90,9 +106,33 @@ public class BlockSpaceAir extends Block implements IAirProvider
     		}
     	}
     	
-    	if(curAir != maxNear - 1)
+    	if(curAir > maxNear - 1)
+    	{
+    		world.setBlockToAir(x, y, z);
+    		
+    		for(ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS)
+        	{
+        		int dx = x + dir.offsetX;
+        		int dy = y + dir.offsetY;
+        		int dz = z + dir.offsetZ;
+        		
+        		Block block = world.getBlock(dx, dy, dz);
+        		int meta = world.getBlockMetadata(dx, dy, dz);
+        		
+        		if(block == SolarCraft.spaceAir)
+        		{
+        			world.setBlock(dx, dy, dz, SolarCraft.spaceAirDecay, meta, 3);
+        		}
+        	}
+    		
+    		return;
+    	} else if(isDecay)
+    	{
+    		return;
+    	} else if(curAir < maxNear - 1)
     	{
     		this.setAirSupply(world, x, y, z, maxNear - 1);
+    		return;
     	} else if(curAir > 1) // Air supply changed so we need to update the surrounding air. NOTE: Only used to create new air blocks. Existing ones can update themselves
 		{
     		for(ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS)
@@ -105,7 +145,7 @@ public class BlockSpaceAir extends Block implements IAirProvider
         		
         		if(block == Blocks.air)
         		{
-        			world.setBlock(dx, dy, dz, SolarCraft.spaceAir, curAir - 2, 2);
+        			world.setBlock(dx, dy, dz, SolarCraft.spaceAir, curAir - 2, 3);
         		}
         	}
 		}
@@ -144,7 +184,7 @@ public class BlockSpaceAir extends Block implements IAirProvider
     {
     	Block block = blockAccess.getBlock(x, y, z);
     	
-    	return !block.getMaterial().isSolid() && block != this;
+    	return !block.getMaterial().isSolid() && !(block instanceof BlockSpaceAir);
     }
 
     /**
@@ -194,10 +234,7 @@ public class BlockSpaceAir extends Block implements IAirProvider
     		return;
     	}
     	
-    	if(SC_Settings.airInterval > 0)
-    	{
-    		world.scheduleBlockUpdate(x, y, z, this, this.tickRate(world));
-    	}
+    	world.scheduleBlockUpdate(x, y, z, this, this.tickRate(world));
     }
 
 	@Override
@@ -221,11 +258,13 @@ public class BlockSpaceAir extends Block implements IAirProvider
 			world.setBlockToAir(x, y, z);
 		} else
 		{
-			world.setBlockMetadataWithNotify(x, y, z, amount - 1, 3);
-			if(SC_Settings.airInterval > 0)
-	    	{
-	    		world.scheduleBlockUpdate(x, y, z, this, this.tickRate(world));
-	    	}
+			if(isDecay)
+			{
+				world.setBlock(x, y, z, SolarCraft.spaceAir, amount - 1, 3);
+			} else
+			{
+				world.setBlockMetadataWithNotify(x, y, z, amount - 1, 3);
+			}
 		}
 	}
 }

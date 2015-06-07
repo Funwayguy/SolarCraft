@@ -38,18 +38,18 @@ public class TileEntityAirVent extends TileEntity implements IFluidHandler
 	        		
 	        		Block block = worldObj.getBlock(dx, dy, dz);
 	        		
-	        		int airOut = MathHelper.clamp_int(airBuffer, 1, 16);
+	        		int airOut = MathHelper.clamp_int(airBuffer/SC_Settings.machineUsage, 1, 16);
 	        		
 	        		if(block == Blocks.air)
 	        		{
-	        			worldObj.setBlock(dx, dy, dz, SolarCraft.spaceAir, airOut - 1, 3);
+	        			worldObj.setBlock(dx, dy, dz, SolarCraft.spaceAir, airOut - 2, 3);
 	        		} else if(block instanceof IAirProvider)
 	        		{
 	        			IAirProvider airTile = (IAirProvider)block;
 	        			
-	        			if(airTile.getAirSupply(this.worldObj, dx, dy, dz) != airOut)
+	        			if(airTile.getAirSupply(this.worldObj, dx, dy, dz) != airOut - 1)
 	        			{
-	        				airTile.setAirSupply(this.worldObj, dx, dy, dz, airOut);
+	        				airTile.setAirSupply(this.worldObj, dx, dy, dz, airOut - 1);
 	        			}
 	        		}
 	        	}
@@ -57,7 +57,10 @@ public class TileEntityAirVent extends TileEntity implements IFluidHandler
 			
 			airBuffer -= SC_Settings.machineUsage;
 			
-			this.worldObj.notifyBlocksOfNeighborChange(this.xCoord, this.yCoord, this.zCoord, SolarCraft.airVent);
+			if(airBuffer < SC_Settings.machineUsage)
+			{
+				this.worldObj.notifyBlocksOfNeighborChange(this.xCoord, this.yCoord, this.zCoord, SolarCraft.airVent);
+			}
 		}
 	}
 		
@@ -84,7 +87,7 @@ public class TileEntityAirVent extends TileEntity implements IFluidHandler
 			return 0;
 		}
 		
-		int change = Math.min(resource.amount, (SC_Settings.machineUsage*32) - this.airBuffer);
+		int change = Math.min(resource.amount, (SC_Settings.machineUsage*24) - this.airBuffer);
 		
 		if(doFill && change != 0)
 		{
@@ -121,6 +124,6 @@ public class TileEntityAirVent extends TileEntity implements IFluidHandler
 	@Override
 	public FluidTankInfo[] getTankInfo(ForgeDirection from)
 	{
-		return new FluidTankInfo[]{new FluidTankInfo(this.airBuffer > 0? new FluidStack(SolarCraft.LOX, this.airBuffer) : null, (SC_Settings.machineUsage*16))};
+		return new FluidTankInfo[]{new FluidTankInfo(this.airBuffer > 0? new FluidStack(SolarCraft.LOX, this.airBuffer) : null, (SC_Settings.machineUsage*24))};
 	}
 }
