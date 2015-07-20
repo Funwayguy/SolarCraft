@@ -69,7 +69,7 @@ public class BlockSpaceAir extends Block implements IAirProvider
     @Override
     public void updateTick(World world, int x, int y, int z, Random rand)
     {
-    	if(world.isRemote)
+    	if(world.isRemote || (rand.nextInt(5) != 0 && isDecay))
     	{
     		return;
     	} else if(tps >= 20)

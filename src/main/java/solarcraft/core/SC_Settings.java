@@ -21,4 +21,5 @@ public class SC_Settings
 	public static String[] cakeLayers = new String[]{Block.blockRegistry.getNameForObject(Blocks.stained_hardened_clay) + ":15"};
 	public static boolean meteorShowers = true;
 	public static int machineUsage = 10;
+	public static float gravityFact = 1F;
 }

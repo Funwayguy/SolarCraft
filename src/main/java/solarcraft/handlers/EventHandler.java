@@ -14,6 +14,7 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.MathHelper;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.terraingen.OreGenEvent.GenerateMinable;
+import net.minecraftforge.event.world.ExplosionEvent;
 import solarcraft.EntitySpawnerFireball;
 import solarcraft.block.BlockSpaceAir;
 import solarcraft.core.SC_Settings;
@@ -35,6 +36,18 @@ public class EventHandler
 		}
 	}
 	
+	@SubscribeEvent
+	public void onExplode(ExplosionEvent.Start event)
+	{
+		StackTraceElement[] e = new Exception().getStackTrace();
+		
+		if(6 < e.length && e[6].getClassName().equalsIgnoreCase(EntityLargeFireball.class.getName()))
+		{
+			event.explosion.isSmoking = true;
+			event.explosion.isFlaming = true;
+		}
+	}
+	
 	long lastMeteor = 0L;
 	
 	@SubscribeEvent
@@ -42,7 +55,7 @@ public class EventHandler
 	{
 		if(event.entityLiving.dimension == 0 && !event.entityLiving.onGround && !(event.entityLiving.isInWater() || event.entityLiving.handleLavaMovement()) && !(event.entityLiving instanceof EntityFlying) && !(event.entityLiving instanceof EntityPlayer && ((EntityPlayer)event.entityLiving).capabilities.isFlying))
 		{
-			event.entityLiving.addVelocity(0D, 0.07D, 0D);
+			event.entityLiving.addVelocity(0D, SC_Settings.gravityFact * 0.07D, 0D);
 			
 			if(event.entityLiving.motionY > -1D)
 			{
@@ -68,7 +81,7 @@ public class EventHandler
 			}
 		}
 		
-		if(SC_Settings.meteorShowers && !event.entityLiving.worldObj.isRemote && event.entityLiving.worldObj.getTotalWorldTime() - lastMeteor >= (event.entityLiving.worldObj.isThundering()? 2 : 5) && event.entityLiving instanceof EntityPlayer)
+		if(SC_Settings.meteorShowers && !event.entityLiving.worldObj.isRemote && event.entityLiving.worldObj.getTotalWorldTime() - lastMeteor >= (event.entityLiving.worldObj.isThundering()? 3 : 7) && event.entityLiving instanceof EntityPlayer)
 		{
 			lastMeteor = event.entityLiving.worldObj.getTotalWorldTime();
 			
@@ -154,7 +167,7 @@ public class EventHandler
 				if(entity.dimension == 0 && !entity.onGround && !(entity.isInWater() || entity.handleLavaMovement()))
 				{
 					entity.motionY = MathHelper.clamp_double(entity.motionY, -3D, 3D); // Make sure entity isn't already too fast for ZeroG
-					entity.addVelocity(0D, 0.037D, 0D); // Give some upward velocity to counter a portion of gravity
+					entity.addVelocity(0D, SC_Settings.gravityFact * 0.037D, 0D); // Give some upward velocity to counter a portion of gravity
 					entity.motionY = MathHelper.clamp_double(entity.motionY, -3D, 3D); // Make sure entity hasn't started going too fast
 				}
 			}
