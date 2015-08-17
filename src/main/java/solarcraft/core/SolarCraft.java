@@ -4,7 +4,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialTransparent;
-import net.minecraft.client.renderer.entity.RenderFireball;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
@@ -16,14 +15,18 @@ import net.minecraftforge.fluids.FluidRegistry;
 import org.apache.logging.log4j.Logger;
 import solarcraft.EntitySpawnerFireball;
 import solarcraft.FluidOxygen;
-import solarcraft.block.*;
-import solarcraft.block.tile.*;
+import solarcraft.block.BlockAirEmitter;
+import solarcraft.block.BlockAirVent;
+import solarcraft.block.BlockSpaceAir;
+import solarcraft.block.BlockWormhole;
+import solarcraft.block.tile.TileEntityAirEmitter;
+import solarcraft.block.tile.TileEntityAirVent;
+import solarcraft.block.tile.TileEntityWormhole;
 import solarcraft.core.proxies.CommonProxy;
 import solarcraft.handlers.ConfigHandler;
 import solarcraft.world.WorldProviderSpace;
 import solarcraft.world.biomes.BiomeGenSpace;
 import solarcraft.world.features.WorldGenSpaceStructure;
-import cpw.mods.fml.client.registry.RenderingRegistry;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
@@ -58,6 +61,7 @@ public class SolarCraft
 	public static BlockSpaceAir spaceAirDecay;
 	public static Block airEmitter;
 	public static Block airVent;
+	public static Block wormhole;
 	
 	public static Fluid LOX;
 	
@@ -78,7 +82,6 @@ public class SolarCraft
     public void init(FMLInitializationEvent event)
     {
     	EntityRegistry.registerModEntity(EntitySpawnerFireball.class, "spawner_fireball", EntityRegistry.findGlobalUniqueEntityId(), instance, 128, 15, true);
-    	RenderingRegistry.registerEntityRenderingHandler(EntitySpawnerFireball.class, new RenderFireball(4.0F));
     	
     	gas = new MaterialTransparent(MapColor.airColor);
     	
@@ -99,6 +102,10 @@ public class SolarCraft
     	airVent = new BlockAirVent();
     	GameRegistry.registerBlock(airVent, "air_vent");
     	GameRegistry.registerTileEntity(TileEntityAirVent.class, "solarcraft.air_vent");
+    	
+    	wormhole = new BlockWormhole();
+    	GameRegistry.registerBlock(wormhole, "wormhole");
+    	GameRegistry.registerTileEntity(TileEntityWormhole.class, "solarcraft.wormhole");
     	
     	GameRegistry.addShapedRecipe(new ItemStack(airEmitter), "XXX", "XTX", "IRI", 'X', new ItemStack(Blocks.iron_bars), 'T', new ItemStack(Blocks.piston), 'I', new ItemStack(Items.iron_ingot), 'R', new ItemStack(Items.redstone));
     	
