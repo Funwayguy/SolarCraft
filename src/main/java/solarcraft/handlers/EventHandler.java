@@ -12,6 +12,7 @@ import net.minecraft.entity.projectile.EntitySmallFireball;
 import net.minecraft.pathfinding.PathPoint;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.MathHelper;
+import net.minecraft.util.Vec3;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.terraingen.OreGenEvent.GenerateMinable;
 import net.minecraftforge.event.world.ExplosionEvent;
@@ -133,7 +134,10 @@ public class EventHandler
 					double distX = point.xCoord - entityLiving.posX;
 					double distZ = point.zCoord - entityLiving.posZ;
 					
-					entityLiving.setVelocity(MathHelper.clamp_double(entityLiving.motionX + distX, -speed, speed), entityLiving.motionY, MathHelper.clamp_double(entityLiving.motionZ + distZ, -speed, speed));
+					Vec3 motion = Vec3.createVectorHelper(MathHelper.clamp_double(entityLiving.motionX + distX, -speed, speed), entityLiving.motionY, MathHelper.clamp_double(entityLiving.motionZ + distZ, -speed, speed));
+					entityLiving.motionX = motion.xCoord;
+					entityLiving.motionY = motion.yCoord;
+					entityLiving.motionZ = motion.zCoord;
 				}
 			}
 		}
