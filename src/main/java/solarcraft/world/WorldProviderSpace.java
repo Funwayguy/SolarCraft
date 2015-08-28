@@ -27,7 +27,7 @@ public class WorldProviderSpace extends WorldProvider
      */
     public IChunkProvider createChunkGenerator()
     {
-        return new ChunkProviderSpace(this.worldObj, this.worldObj.getSeed());
+        return new ChunkProviderSpace(this.worldObj, this.worldObj.getSeed(), this.worldObj.getWorldInfo().isMapFeaturesEnabled());
     }
 
     /**

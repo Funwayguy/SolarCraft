@@ -16,6 +16,10 @@ import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.gen.NoiseGenerator;
 import net.minecraft.world.gen.NoiseGeneratorOctaves;
+import net.minecraft.world.gen.structure.MapGenMineshaft;
+import net.minecraft.world.gen.structure.MapGenScatteredFeature;
+import net.minecraft.world.gen.structure.MapGenStronghold;
+import net.minecraft.world.gen.structure.MapGenVillage;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.terraingen.ChunkProviderEvent;
 import net.minecraftforge.event.terraingen.PopulateChunkEvent;
@@ -42,9 +46,19 @@ public class ChunkProviderSpace implements IChunkProvider
     double[] noiseData4;
     double[] noiseData5;
     int[][] field_73203_h = new int[32][32];
+    /** are map structures going to be generated (e.g. strongholds) */
+    private final boolean mapFeaturesEnabled;
+    /** Holds Stronghold Generator */
+    private MapGenStronghold strongholdGenerator = new MapGenStronghold();
+    /** Holds Village Generator */
+    private MapGenVillage villageGenerator = new MapGenVillage();
+    /** Holds Mineshaft Generator */
+    private MapGenMineshaft mineshaftGenerator = new MapGenMineshaft();
+    private MapGenScatteredFeature scatteredFeatureGenerator = new MapGenScatteredFeature();
 
-    public ChunkProviderSpace(World p_i2007_1_, long p_i2007_2_)
+    public ChunkProviderSpace(World p_i2007_1_, long p_i2007_2_, boolean genStructures)
     {
+    	this.mapFeaturesEnabled = genStructures;
         this.endWorld = p_i2007_1_;
         this.endRNG = new Random(p_i2007_2_);
         this.noiseGen1 = new NoiseGeneratorOctaves(this.endRNG, 16);
@@ -255,6 +269,15 @@ public class ChunkProviderSpace implements IChunkProvider
         this.biomesForGeneration = this.endWorld.getWorldChunkManager().loadBlockGeneratorData(this.biomesForGeneration, p_73154_1_ * 16, p_73154_2_ * 16, 16, 16);
         this.func_147420_a(p_73154_1_, p_73154_2_, ablock, this.biomesForGeneration);
         this.replaceBiomeBlocks(p_73154_1_, p_73154_2_, ablock, this.biomesForGeneration, meta);
+
+        if (SC_Settings.genGrass && this.mapFeaturesEnabled)
+        {
+            this.mineshaftGenerator.func_151539_a(this, this.endWorld, p_73154_1_, p_73154_2_, ablock);
+            this.villageGenerator.func_151539_a(this, this.endWorld, p_73154_1_, p_73154_2_, ablock);
+            this.strongholdGenerator.func_151539_a(this, this.endWorld, p_73154_1_, p_73154_2_, ablock);
+            this.scatteredFeatureGenerator.func_151539_a(this, this.endWorld, p_73154_1_, p_73154_2_, ablock);
+        }
+        
         Chunk chunk = new Chunk(this.endWorld, ablock, meta, p_73154_1_, p_73154_2_);
         byte[] abyte = chunk.getBiomeArray();
 
@@ -459,6 +482,14 @@ public class ChunkProviderSpace implements IChunkProvider
 
         MinecraftForge.EVENT_BUS.post(new PopulateChunkEvent.Pre(p_73153_1_, endWorld, endWorld.rand, p_73153_2_, p_73153_3_, false));
 
+        if (SC_Settings.genGrass && this.mapFeaturesEnabled)
+        {
+            this.mineshaftGenerator.generateStructuresInChunk(this.endWorld, this.endWorld.rand, p_73153_2_, p_73153_3_);
+            this.villageGenerator.generateStructuresInChunk(this.endWorld, this.endWorld.rand, p_73153_2_, p_73153_3_);
+            this.strongholdGenerator.generateStructuresInChunk(this.endWorld, this.endWorld.rand, p_73153_2_, p_73153_3_);
+            this.scatteredFeatureGenerator.generateStructuresInChunk(this.endWorld, this.endWorld.rand, p_73153_2_, p_73153_3_);
+        }
+
         int k = p_73153_2_ * 16;
         int l = p_73153_3_ * 16;
         
@@ -521,7 +552,7 @@ public class ChunkProviderSpace implements IChunkProvider
     public List getPossibleCreatures(EnumCreatureType p_73155_1_, int p_73155_2_, int p_73155_3_, int p_73155_4_)
     {
         BiomeGenBase biomegenbase = this.endWorld.getBiomeGenForCoords(p_73155_2_, p_73155_4_);
-        return biomegenbase.getSpawnableList(p_73155_1_);
+        return p_73155_1_ == EnumCreatureType.monster && this.scatteredFeatureGenerator.func_143030_a(p_73155_2_, p_73155_3_, p_73155_4_) ? this.scatteredFeatureGenerator.getScatteredFeatureSpawnList() : biomegenbase.getSpawnableList(p_73155_1_);
     }
 
     public ChunkPosition func_147416_a(World p_147416_1_, String p_147416_2_, int p_147416_3_, int p_147416_4_, int p_147416_5_)
@@ -534,5 +565,14 @@ public class ChunkProviderSpace implements IChunkProvider
         return 0;
     }
 
-    public void recreateStructures(int p_82695_1_, int p_82695_2_) {}
+    public void recreateStructures(int p_82695_1_, int p_82695_2_)
+    {
+        if (SC_Settings.genGrass && this.mapFeaturesEnabled)
+        {
+            this.mineshaftGenerator.func_151539_a(this, this.endWorld, p_82695_1_, p_82695_2_, (Block[])null);
+            this.villageGenerator.func_151539_a(this, this.endWorld, p_82695_1_, p_82695_2_, (Block[])null);
+            this.strongholdGenerator.func_151539_a(this, this.endWorld, p_82695_1_, p_82695_2_, (Block[])null);
+            this.scatteredFeatureGenerator.func_151539_a(this, this.endWorld, p_82695_1_, p_82695_2_, (Block[])null);
+        }
+    }
 }
