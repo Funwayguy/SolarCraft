@@ -114,7 +114,7 @@ public class SolarCraft
     	
     	DimensionManager.unregisterDimension(0);
     	DimensionManager.unregisterProviderType(0);
-    	DimensionManager.registerProviderType(0, WorldProviderSpace.class, false);
+    	DimensionManager.registerProviderType(0, WorldProviderSpace.class, true);
     	DimensionManager.registerDimension(0, 0);
     	
     	GameRegistry.registerWorldGenerator(new WorldGenSpaceStructure(), 0);

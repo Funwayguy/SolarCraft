@@ -365,7 +365,7 @@ public class ChunkProviderSpace implements IChunkProvider
                 float spawnWeight = 100F - (spawnDist * SC_Settings.spawnIsland/10F);
                 float f2 = MathHelper.clamp_float(spawnWeight, SC_Settings.asteroidWeight, 80F);//Percentage of the island's density at this position
                 
-                if(boundryMidDist <= SC_Settings.scorchedBoundry/2F + 4)
+                if(SC_Settings.scorchedBoundry > SC_Settings.spawnIsland && boundryMidDist <= SC_Settings.scorchedBoundry/2F + 4)
                 {
                 	f2 -= 100 * ((SC_Settings.scorchedBoundry/2F + 4) - boundryMidDist)/4F;
                 }
