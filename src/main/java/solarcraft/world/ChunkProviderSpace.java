@@ -295,14 +295,6 @@ public class ChunkProviderSpace implements IChunkProvider
             {
         		abyte[k] = (byte)SolarCraft.spaceBiome.biomeID;
             }
-            
-        	/*if(SC_Settings.genGrass)
-        	{
-        		abyte[k] = (byte)this.biomesForGeneration[k].biomeID;
-        	} else
-        	{
-        		abyte[k] = (byte)SolarCraft.spaceBiome.biomeID;
-        	}*/
         }
 
         chunk.generateSkylightMap();
@@ -479,31 +471,36 @@ public class ChunkProviderSpace implements IChunkProvider
     public void populate(IChunkProvider p_73153_1_, int p_73153_2_, int p_73153_3_)
     {
         BlockFalling.fallInstantly = true;
-
-        MinecraftForge.EVENT_BUS.post(new PopulateChunkEvent.Pre(p_73153_1_, endWorld, endWorld.rand, p_73153_2_, p_73153_3_, false));
-
+        
+        this.endRNG.setSeed(this.endWorld.getSeed());
+        long i1 = this.endRNG.nextLong() / 2L * 2L + 1L;
+        long j1 = this.endRNG.nextLong() / 2L * 2L + 1L;
+        this.endRNG.setSeed((long)p_73153_2_ * i1 + (long)p_73153_3_ * j1 ^ endWorld.getSeed());
+        
+        MinecraftForge.EVENT_BUS.post(new PopulateChunkEvent.Pre(p_73153_1_, endWorld, this.endRNG, p_73153_2_, p_73153_3_, false));
+        
         if (SC_Settings.genGrass && this.mapFeaturesEnabled)
         {
-            this.mineshaftGenerator.generateStructuresInChunk(this.endWorld, this.endWorld.rand, p_73153_2_, p_73153_3_);
-            this.villageGenerator.generateStructuresInChunk(this.endWorld, this.endWorld.rand, p_73153_2_, p_73153_3_);
-            this.strongholdGenerator.generateStructuresInChunk(this.endWorld, this.endWorld.rand, p_73153_2_, p_73153_3_);
-            this.scatteredFeatureGenerator.generateStructuresInChunk(this.endWorld, this.endWorld.rand, p_73153_2_, p_73153_3_);
+            this.mineshaftGenerator.generateStructuresInChunk(this.endWorld, this.endRNG, p_73153_2_, p_73153_3_);
+            this.villageGenerator.generateStructuresInChunk(this.endWorld, this.endRNG, p_73153_2_, p_73153_3_);
+            this.strongholdGenerator.generateStructuresInChunk(this.endWorld, this.endRNG, p_73153_2_, p_73153_3_);
+            this.scatteredFeatureGenerator.generateStructuresInChunk(this.endWorld, this.endRNG, p_73153_2_, p_73153_3_);
         }
-
+        
         int k = p_73153_2_ * 16;
         int l = p_73153_3_ * 16;
         
         if(SC_Settings.genGrass)
         {
         	BiomeGenBase biomegenbase = this.endWorld.getBiomeGenForCoords(k + 16, l + 16);
-        	biomegenbase.decorate(this.endWorld, this.endWorld.rand, k, l);
+        	biomegenbase.decorate(this.endWorld, this.endRNG, k, l);
         } else
         {
-        	SolarCraft.spaceBiome.decorate(this.endWorld, this.endWorld.rand, k, l);
+        	SolarCraft.spaceBiome.decorate(this.endWorld, this.endRNG, k, l);
         }
-
-        MinecraftForge.EVENT_BUS.post(new PopulateChunkEvent.Post(p_73153_1_, endWorld, endWorld.rand, p_73153_2_, p_73153_3_, false));
-
+        
+        MinecraftForge.EVENT_BUS.post(new PopulateChunkEvent.Post(p_73153_1_, endWorld, endRNG, p_73153_2_, p_73153_3_, false));
+        
         BlockFalling.fallInstantly = false;
     }
 

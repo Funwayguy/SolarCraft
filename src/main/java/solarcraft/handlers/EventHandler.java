@@ -119,7 +119,8 @@ public class EventHandler
 				double distX = entityLiving.getAttackTarget().posX - entityLiving.posX;
 				double distZ = entityLiving.getAttackTarget().posZ - entityLiving.posZ;
 				
-				entityLiving.setVelocity(MathHelper.clamp_double(entityLiving.motionX + distX, -speed, speed), entityLiving.motionY, MathHelper.clamp_double(entityLiving.motionZ + distZ, -speed, speed));
+				entityLiving.motionX = MathHelper.clamp_double(entityLiving.motionX + distX, -speed, speed);
+				entityLiving.motionZ = MathHelper.clamp_double(entityLiving.motionZ + distZ, -speed, speed);
 				
 				if(!entityLiving.getNavigator().noPath())
 				{
