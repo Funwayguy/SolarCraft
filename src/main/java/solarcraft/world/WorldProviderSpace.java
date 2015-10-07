@@ -1,5 +1,6 @@
 package solarcraft.world;
 
+import solarcraft.core.SC_Settings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.ChunkCoordinates;
@@ -12,12 +13,33 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 public class WorldProviderSpace extends WorldProvider
 {
+	public static Class<? extends WorldProvider> oldClass;
+	WorldProvider oldProvider;
+	
+	public WorldProviderSpace()
+	{
+		try
+		{
+			oldProvider = oldClass.newInstance();
+		} catch(Exception e)
+		{
+			
+		}
+	}
+	
     /**
      * creates a new world chunk manager for WorldProvider
      */
     public void registerWorldChunkManager()
     {
-        this.worldChunkMgr = new WorldChunkManagerSpace(this.worldObj);
+    	if(oldProvider != null)
+    	{
+    		oldProvider.registerWorld(this.worldObj);
+    		this.worldChunkMgr = oldProvider.worldChunkMgr;
+    	} else
+    	{
+    		this.worldChunkMgr = new WorldChunkManagerSpace(this.worldObj);
+    	}
         this.dimensionId = 0;
         this.hasNoSky = false;
     }
@@ -44,7 +66,7 @@ public class WorldProviderSpace extends WorldProvider
     @SideOnly(Side.CLIENT)
     public float[] calcSunriseSunsetColors(float p_76560_1_, float p_76560_2_)
     {
-        return null;
+        return SC_Settings.spaceSkybox? null : super.calcSunriseSunsetColors(p_76560_1_, p_76560_2_);
     }
 
     /**
@@ -53,8 +75,10 @@ public class WorldProviderSpace extends WorldProvider
     @SideOnly(Side.CLIENT)
     public Vec3 getFogColor(float p_76562_1_, float p_76562_2_)
     {
-    	//return super.getFogColor(p_76562_1_, p_76562_2_);
-		if(Minecraft.getMinecraft().thePlayer != null && Minecraft.getMinecraft().thePlayer.isPotionActive(Potion.nightVision))
+    	if(!SC_Settings.spaceSkybox)
+    	{
+    		return super.getFogColor(p_76562_1_, p_76562_2_);
+    	} else if(Minecraft.getMinecraft().thePlayer != null && Minecraft.getMinecraft().thePlayer.isPotionActive(Potion.nightVision))
 		{
 			return Vec3.createVectorHelper(1D, 1D, 1D);
 		} else
@@ -66,7 +90,7 @@ public class WorldProviderSpace extends WorldProvider
     @SideOnly(Side.CLIENT)
     public boolean isSkyColored()
     {
-        return false;
+        return !SC_Settings.spaceSkybox;
     }
 
     public int getActualHeight()
@@ -81,7 +105,7 @@ public class WorldProviderSpace extends WorldProvider
 
     public double getHorizon()
     {
-        return 0D;
+        return SC_Settings.spaceSkybox? 0D : super.getHorizon();
     }
 
     /**
@@ -154,7 +178,7 @@ public class WorldProviderSpace extends WorldProvider
     @SideOnly(Side.CLIENT)
     public float getStarBrightness(float par1)
     {
-        return 1F;
+        return SC_Settings.spaceSkybox? 1F : super.getStarBrightness(par1);
     }
 
     /**

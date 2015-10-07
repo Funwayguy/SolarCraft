@@ -22,4 +22,5 @@ public class SC_Settings
 	public static boolean meteorShowers = true;
 	public static int machineUsage = 10;
 	public static float gravityFact = 1F;
+	public static boolean spaceSkybox = true;
 }

@@ -1,5 +1,6 @@
 package solarcraft.handlers;
 
+import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraftforge.common.config.Configuration;
 import org.apache.logging.log4j.Level;
 import solarcraft.core.SC_Settings;
@@ -55,6 +56,8 @@ public class ConfigHandler
 		SC_Settings.meteorShowers = config.getBoolean("Meteor Showers", Configuration.CATEGORY_GENERAL, true, "Makes it rain down flaming projectiles during storms");
 		SC_Settings.machineUsage = config.getInt("Machine Use Cost", Configuration.CATEGORY_GENERAL, 10, 10, 1000, "The amount of RF/mB per tick required for a machine to function (x20 for recharge)");
 		SC_Settings.gravityFact = 1F/config.getFloat("Gravity Factor", Configuration.CATEGORY_GENERAL, 1F, 0.01F, 100F, "Gravity strength factor");
+		SC_Settings.spaceSkybox = config.getBoolean("Space Skybox", Configuration.CATEGORY_GENERAL, true, "Replaces the normal overworld skybox with only stars");
+		SC_Settings.spaceBiomeID = config.getInt("Space Biome ID", Configuration.CATEGORY_GENERAL, 24, 0, BiomeGenBase.getBiomeGenArray().length - 1, "The biome ID used in the scorched area of space");
 		
 		config.save();
 		

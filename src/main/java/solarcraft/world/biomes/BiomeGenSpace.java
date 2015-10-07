@@ -24,7 +24,7 @@ public class BiomeGenSpace extends BiomeGenBase
 	@SuppressWarnings("unchecked")
 	public BiomeGenSpace(int id)
 	{
-        super(id, false);
+        super(id, true);
         this.spawnableMonsterList.clear();
         this.spawnableCreatureList.clear();
         this.spawnableWaterCreatureList.clear();

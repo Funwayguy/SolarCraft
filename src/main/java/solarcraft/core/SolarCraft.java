@@ -12,6 +12,7 @@ import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
 import solarcraft.EntitySpawnerFireball;
 import solarcraft.FluidOxygen;
@@ -109,13 +110,13 @@ public class SolarCraft
     	
     	GameRegistry.addShapedRecipe(new ItemStack(airEmitter), "XXX", "XTX", "IRI", 'X', new ItemStack(Blocks.iron_bars), 'T', new ItemStack(Blocks.piston), 'I', new ItemStack(Items.iron_ingot), 'R', new ItemStack(Items.redstone));
     	
-    	spaceBiome = new BiomeGenSpace(SC_Settings.spaceBiomeID);
-    	//BiomeDictionary.registerBiomeType(spaceBiome);
+    	if(BiomeGenBase.getBiome(SC_Settings.spaceBiomeID) != null)
+    	{
+    		logger.log(Level.ERROR, "SolarCraft space biome ID is conflicting with " + BiomeGenBase.getBiome(SC_Settings.spaceBiomeID).biomeName);
+    		logger.log(Level.ERROR, "Biomes may break severely! Please fix this in your configuration files!");
+    	}
     	
-    	DimensionManager.unregisterDimension(0);
-    	DimensionManager.unregisterProviderType(0);
-    	DimensionManager.registerProviderType(0, WorldProviderSpace.class, true);
-    	DimensionManager.registerDimension(0, 0);
+    	spaceBiome = new BiomeGenSpace(SC_Settings.spaceBiomeID);
     	
     	GameRegistry.registerWorldGenerator(new WorldGenSpaceStructure(), 0);
     }
@@ -123,5 +124,10 @@ public class SolarCraft
     @EventHandler
     public void postInit(FMLPostInitializationEvent event)
     {
+    	WorldProviderSpace.oldClass = DimensionManager.createProviderFor(0).getClass();
+    	DimensionManager.unregisterDimension(0);
+    	DimensionManager.unregisterProviderType(0);
+    	DimensionManager.registerProviderType(0, WorldProviderSpace.class, true);
+    	DimensionManager.registerDimension(0, 0);
     }
 }
