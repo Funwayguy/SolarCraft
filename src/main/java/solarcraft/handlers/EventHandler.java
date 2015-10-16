@@ -98,7 +98,8 @@ public class EventHandler
 					fireball = new EntitySpawnerFireball(event.entityLiving.worldObj, spawnX, 255, spawnZ, 0.1D, -2D, 0.1D);
 				} else if(event.entityLiving.getRNG().nextInt(100) < 25)
 				{
-					fireball = new EntityLargeFireball(event.entityLiving.worldObj, spawnX, 255, spawnZ, 0.1D, -2D, 0.1D);
+					fireball = new EntityLargeFireball(event.entityLiving.worldObj, null, 0.1D, -2D, 0.1D);
+					fireball.setPosition(spawnX, 255, spawnZ);
 				} else
 				{
 					fireball = new EntitySmallFireball(event.entityLiving.worldObj, spawnX, 255, spawnZ, 0.1D, -2D, 0.1D);
