@@ -16,6 +16,7 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
 import solarcraft.EntitySpawnerFireball;
 import solarcraft.FluidOxygen;
+import solarcraft.ItemWormhole;
 import solarcraft.block.BlockAirEmitter;
 import solarcraft.block.BlockAirVent;
 import solarcraft.block.BlockSpaceAir;
@@ -25,6 +26,9 @@ import solarcraft.block.tile.TileEntityAirVent;
 import solarcraft.block.tile.TileEntityWormhole;
 import solarcraft.core.proxies.CommonProxy;
 import solarcraft.handlers.ConfigHandler;
+import solarcraft.world.Planet;
+import solarcraft.world.WorldGenWormhole;
+import solarcraft.world.WorldProviderPlanet;
 import solarcraft.world.WorldProviderSpace;
 import solarcraft.world.biomes.BiomeGenSpace;
 import solarcraft.world.features.WorldGenSpaceStructure;
@@ -77,6 +81,13 @@ public class SolarCraft
     	ConfigHandler.initConfigs();
     	
     	proxy.registerHandlers();
+    	
+    	for(Planet planet : Planet.planets.values())
+    	{
+    		DimensionManager.registerProviderType(planet.dimensionID, WorldProviderPlanet.class, false);
+    		DimensionManager.registerDimension(planet.dimensionID, planet.dimensionID);
+    		logger.log(Level.INFO, "Registered planet " + planet.name);
+    	}
     }
     
     @EventHandler
@@ -105,7 +116,7 @@ public class SolarCraft
     	GameRegistry.registerTileEntity(TileEntityAirVent.class, "solarcraft.air_vent");
     	
     	wormhole = new BlockWormhole();
-    	GameRegistry.registerBlock(wormhole, "wormhole");
+    	GameRegistry.registerBlock(wormhole, ItemWormhole.class, "wormhole");
     	GameRegistry.registerTileEntity(TileEntityWormhole.class, "solarcraft.wormhole");
     	
     	GameRegistry.addShapedRecipe(new ItemStack(airEmitter), "XXX", "XTX", "IRI", 'X', new ItemStack(Blocks.iron_bars), 'T', new ItemStack(Blocks.piston), 'I', new ItemStack(Items.iron_ingot), 'R', new ItemStack(Items.redstone));
@@ -119,6 +130,7 @@ public class SolarCraft
     	spaceBiome = new BiomeGenSpace(SC_Settings.spaceBiomeID);
     	
     	GameRegistry.registerWorldGenerator(new WorldGenSpaceStructure(), 0);
+    	GameRegistry.registerWorldGenerator(new WorldGenWormhole(), 0);
     }
     
     @EventHandler

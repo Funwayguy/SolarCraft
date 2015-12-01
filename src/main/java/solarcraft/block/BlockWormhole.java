@@ -6,6 +6,8 @@ import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 
@@ -18,6 +20,19 @@ public class BlockWormhole extends Block implements ITileEntityProvider
 		this.setBlockName("solarcraft.wormhole");
 		this.setCreativeTab(CreativeTabs.tabMisc);
 	}
+
+    /**
+     * Called when the block is placed in the world.
+     */
+    public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase entityLiving, ItemStack stack)
+    {
+    	TileEntity tile = world.getTileEntity(x, y, z);
+    	
+    	if(tile != null && tile instanceof TileEntityWormhole && stack.getTagCompound() != null)
+    	{
+    		((TileEntityWormhole)tile).dimension = stack.getTagCompound().getInteger("portal_dimension");
+    	}
+    }
 	
 	@Override
 	public int quantityDropped(Random rand)

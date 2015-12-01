@@ -1,10 +1,12 @@
 package solarcraft.handlers;
 
 import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.Configuration;
 import org.apache.logging.log4j.Level;
 import solarcraft.core.SC_Settings;
 import solarcraft.core.SolarCraft;
+import solarcraft.world.Planet;
 
 public class ConfigHandler
 {
@@ -58,6 +60,25 @@ public class ConfigHandler
 		SC_Settings.gravityFact = 1F/config.getFloat("Gravity Factor", Configuration.CATEGORY_GENERAL, 1F, 0.01F, 100F, "Gravity strength factor");
 		SC_Settings.spaceSkybox = config.getBoolean("Space Skybox", Configuration.CATEGORY_GENERAL, true, "Replaces the normal overworld skybox with only stars");
 		SC_Settings.spaceBiomeID = config.getInt("Space Biome ID", Configuration.CATEGORY_GENERAL, 24, 0, BiomeGenBase.getBiomeGenArray().length - 1, "The biome ID used in the scorched area of space");
+		
+		if(!config.hasCategory("Planets"))
+		{
+			config.getInt("Biome ID", "Planets.default", BiomeGenBase.forest.biomeID, 0, BiomeGenBase.getBiomeGenArray().length - 1, "The planet's biome");
+			config.getInt("Dimension ID", "Planets.default", 2, Integer.MIN_VALUE, Integer.MAX_VALUE, "The planet's dimension ID");
+			config.getString("Planet Name", "Planets.default", "Forest Planet", "The planet's technical name");
+		}
+		
+		ConfigCategory rootPlanCat = config.getCategory("Planets");
+		
+		Planet.planets.clear();
+		for(ConfigCategory planCat : rootPlanCat.getChildren())
+		{
+			int b = config.getInt("Biome ID", planCat.getQualifiedName(), 0, 0, BiomeGenBase.getBiomeGenArray().length - 1, "The planet's biome");
+			int d = config.getInt("Dimension ID", planCat.getQualifiedName(), -100, Integer.MIN_VALUE, Integer.MAX_VALUE, "The planet's dimension ID");
+			String name = config.getString("Planet Name", planCat.getQualifiedName(), "New Planet", "The planet's technical name");
+			Planet.planets.put(d, new Planet(name, b, d));
+		}
+		SolarCraft.logger.log(Level.INFO, "Loaded " + Planet.planets.size() + " custom planet(s)");
 		
 		config.save();
 		

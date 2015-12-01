@@ -1,4 +1,5 @@
 tile.solarcraft.air_emitter.name=Air Emitter
 tile.solarcraft.space_air.name=Oxygen Block
 tile.solarcraft.air_vent.name=Air Vent
+tile.solarcraft.wormhole.name=Wormhole
 fluid.oxygen=Oxygen
