@@ -296,7 +296,7 @@ public class ChunkProviderSpace implements IChunkProvider
             	BiomeGenBase b = this.biomesForGeneration[k];
             	List<Type> list = Arrays.asList(BiomeDictionary.getTypesForBiome(b));
             	
-            	if(list.add(Type.OCEAN))
+            	if(list.contains(Type.OCEAN))
             	{
             		abyte[k] = (byte)BiomeGenBase.plains.biomeID;
             	} else
