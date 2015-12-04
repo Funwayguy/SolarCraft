@@ -1,5 +1,6 @@
 package solarcraft.world;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import net.minecraft.block.Block;
@@ -20,6 +21,8 @@ import net.minecraft.world.gen.structure.MapGenMineshaft;
 import net.minecraft.world.gen.structure.MapGenScatteredFeature;
 import net.minecraft.world.gen.structure.MapGenStronghold;
 import net.minecraft.world.gen.structure.MapGenVillage;
+import net.minecraftforge.common.BiomeDictionary;
+import net.minecraftforge.common.BiomeDictionary.Type;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.terraingen.ChunkProviderEvent;
 import net.minecraftforge.event.terraingen.PopulateChunkEvent;
@@ -290,7 +293,16 @@ public class ChunkProviderSpace implements IChunkProvider
             
             if(spawnDist >= SC_Settings.scorchedArea && SC_Settings.genGrass)
             {
-        		abyte[k] = (byte)this.biomesForGeneration[k].biomeID;
+            	BiomeGenBase b = this.biomesForGeneration[k];
+            	List<Type> list = Arrays.asList(BiomeDictionary.getTypesForBiome(b));
+            	
+            	if(list.add(Type.OCEAN))
+            	{
+            		abyte[k] = (byte)BiomeGenBase.plains.biomeID;
+            	} else
+            	{
+            		abyte[k] = (byte)this.biomesForGeneration[k].biomeID;
+            	}
             } else
             {
         		abyte[k] = (byte)SolarCraft.spaceBiome.biomeID;
@@ -546,7 +558,8 @@ public class ChunkProviderSpace implements IChunkProvider
     /**
      * Returns a list of creatures of the specified type that can spawn at the given location.
      */
-    public List getPossibleCreatures(EnumCreatureType p_73155_1_, int p_73155_2_, int p_73155_3_, int p_73155_4_)
+    @SuppressWarnings("rawtypes")
+	public List getPossibleCreatures(EnumCreatureType p_73155_1_, int p_73155_2_, int p_73155_3_, int p_73155_4_)
     {
         BiomeGenBase biomegenbase = this.endWorld.getBiomeGenForCoords(p_73155_2_, p_73155_4_);
         return p_73155_1_ == EnumCreatureType.monster && this.scatteredFeatureGenerator.func_143030_a(p_73155_2_, p_73155_3_, p_73155_4_) ? this.scatteredFeatureGenerator.getScatteredFeatureSpawnList() : biomegenbase.getSpawnableList(p_73155_1_);

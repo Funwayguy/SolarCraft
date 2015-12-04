@@ -29,6 +29,7 @@ public class WorldChunkManagerSpace extends WorldChunkManager
         this.biomeIndexLayer = agenlayer[1];
     }
 	
+	@SuppressWarnings("rawtypes")
 	@Override
 	public List getBiomesToSpawnIn()
     {
@@ -134,7 +135,8 @@ public class WorldChunkManagerSpace extends WorldChunkManager
         }
     }
 
-    public ChunkPosition findBiomePosition(int p_150795_1_, int p_150795_2_, int p_150795_3_, List p_150795_4_, Random p_150795_5_)
+    @SuppressWarnings("rawtypes")
+	public ChunkPosition findBiomePosition(int p_150795_1_, int p_150795_2_, int p_150795_3_, List p_150795_4_, Random p_150795_5_)
     {
         IntCache.resetIntCache();
         int l = p_150795_1_ - p_150795_3_ >> 2;
@@ -166,7 +168,8 @@ public class WorldChunkManagerSpace extends WorldChunkManager
     /**
      * checks given Chunk's Biomes against List of allowed ones
      */
-    public boolean areBiomesViable(int p_76940_1_, int p_76940_2_, int p_76940_3_, List p_76940_4_)
+    @SuppressWarnings("rawtypes")
+	public boolean areBiomesViable(int p_76940_1_, int p_76940_2_, int p_76940_3_, List p_76940_4_)
     {
         IntCache.resetIntCache();
         int l = p_76940_1_ - p_76940_3_ >> 2;
