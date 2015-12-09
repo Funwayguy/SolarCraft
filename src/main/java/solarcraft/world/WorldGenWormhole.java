@@ -1,6 +1,7 @@
 package solarcraft.world;
 
 import java.util.Random;
+import solarcraft.core.SC_Settings;
 import solarcraft.core.SolarCraft;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.IChunkProvider;
@@ -11,7 +12,7 @@ public class WorldGenWormhole implements IWorldGenerator
 	@Override
 	public void generate(Random random, int chunkX, int chunkZ, World world, IChunkProvider chunkGenerator, IChunkProvider chunkProvider)
 	{
-		if(world.isRemote || random.nextInt(1000) != 0)
+		if(!SC_Settings.generateWormholes || world.isRemote || random.nextInt(1000) != 0)
 		{
 			return;
 		}

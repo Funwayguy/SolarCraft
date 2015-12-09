@@ -84,6 +84,11 @@ public class SolarCraft
     	
     	for(Planet planet : Planet.planets.values())
     	{
+    		if(DimensionManager.isDimensionRegistered(planet.dimensionID))
+    		{
+    			logger.log(Level.WARN, "Unable to register planet " + planet.name + ". Dimension " + planet.dimensionID + " is already registered however wormholes will still be usable to this location");
+    			continue;
+    		}
     		DimensionManager.registerProviderType(planet.dimensionID, WorldProviderPlanet.class, false);
     		DimensionManager.registerDimension(planet.dimensionID, planet.dimensionID);
     		logger.log(Level.INFO, "Registered planet " + planet.name);

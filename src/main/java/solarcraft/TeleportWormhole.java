@@ -49,6 +49,8 @@ public class TeleportWormhole
                 
                 ChunkCoordinates chunkcoordinates = worldserver1.getSpawnPoint();
                 
+                chunkcoordinates.posY = worldserver1.getTopSolidOrLiquidBlock(chunkcoordinates.posX, chunkcoordinates.posZ);
+                
                 entity.setLocationAndAngles((double)chunkcoordinates.posX, (double)chunkcoordinates.posY, (double)chunkcoordinates.posZ, entity.rotationYaw, entity.rotationPitch);
 
                 worldserver1.spawnEntityInWorld(entity);

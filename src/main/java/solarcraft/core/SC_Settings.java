@@ -23,4 +23,5 @@ public class SC_Settings
 	public static int machineUsage = 10;
 	public static float gravityFact = 1F;
 	public static boolean spaceSkybox = true;
+	public static boolean generateWormholes = true;
 }

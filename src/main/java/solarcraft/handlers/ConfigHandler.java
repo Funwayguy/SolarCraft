@@ -59,6 +59,7 @@ public class ConfigHandler
 		SC_Settings.machineUsage = config.getInt("Machine Use Cost", Configuration.CATEGORY_GENERAL, 10, 10, 1000, "The amount of RF/mB per tick required for a machine to function (x20 for recharge)");
 		SC_Settings.gravityFact = 1F/config.getFloat("Gravity Factor", Configuration.CATEGORY_GENERAL, 1F, 0.01F, 100F, "Gravity strength factor");
 		SC_Settings.spaceSkybox = config.getBoolean("Space Skybox", Configuration.CATEGORY_GENERAL, true, "Replaces the normal overworld skybox with only stars");
+		SC_Settings.generateWormholes = config.getBoolean("Generate Wormholes", Configuration.CATEGORY_GENERAL, true, "Generates natural wormholes in all worlds (fairly rare)");
 		SC_Settings.spaceBiomeID = config.getInt("Space Biome ID", Configuration.CATEGORY_GENERAL, 24, 0, BiomeGenBase.getBiomeGenArray().length - 1, "The biome ID used in the scorched area of space");
 		
 		if(!config.hasCategory("Planets"))
