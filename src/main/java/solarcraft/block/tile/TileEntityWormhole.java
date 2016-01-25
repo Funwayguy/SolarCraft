@@ -13,11 +13,18 @@ import net.minecraft.util.Vec3;
 
 public class TileEntityWormhole extends TileEntity
 {
+	public int cooldown = 60;
 	public int dimension = 0;
 	
 	@Override
     public void updateEntity()
     {
+		if(cooldown > 0)
+		{
+			cooldown--;
+			return;
+		}
+		
 		float size = 32F;
 		double speed = 0.05D;
 		
@@ -32,7 +39,7 @@ public class TileEntityWormhole extends TileEntity
     			continue;
     		}
     		
-    		if(entity.getDistance(this.xCoord, this.yCoord, this.zCoord) < 2D && entity.timeUntilPortal <= 0)
+    		if(entity.getDistance(this.xCoord + 0.5D, this.yCoord + 0.5D, this.zCoord + 0.5D) < 2D && entity.timeUntilPortal <= 0)
     		{
     			if(entity.worldObj.provider.dimensionId == 0)
     			{
@@ -65,9 +72,9 @@ public class TileEntityWormhole extends TileEntity
     			}
     		} else
     		{
-	    		double scale = (size - entity.getDistance(this.xCoord, this.yCoord, this.zCoord))/size;
+	    		double scale = (size - entity.getDistance(this.xCoord + 0.5D, this.yCoord + 0.5D, this.zCoord + 0.5D))/size;
 	    		
-	    		Vec3 dir = Vec3.createVectorHelper(entity.posX - this.xCoord, entity.posY - this.yCoord, entity.posZ - this.zCoord);
+	    		Vec3 dir = Vec3.createVectorHelper(entity.posX - (this.xCoord + 0.5D), entity.posY - (this.yCoord + 0.5D), entity.posZ - (this.zCoord + 0.5D));
 	    		dir = dir.normalize();
 	    		entity.addVelocity(dir.xCoord * -speed * scale, dir.yCoord * -speed * scale, dir.zCoord * -speed * scale);
     		}
@@ -77,7 +84,7 @@ public class TileEntityWormhole extends TileEntity
 	@Override
 	public void readFromNBT(NBTTagCompound tags)
 	{
-		this.dimension = tags.getInteger("portal_dimension");
+		this.dimension = tags.hasKey("portal_dimension")? tags.getInteger("portal_dimension") : -1;
 	}
 	
 	@Override
