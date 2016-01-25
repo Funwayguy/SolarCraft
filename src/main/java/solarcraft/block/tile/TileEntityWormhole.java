@@ -84,12 +84,16 @@ public class TileEntityWormhole extends TileEntity
 	@Override
 	public void readFromNBT(NBTTagCompound tags)
 	{
-		this.dimension = tags.hasKey("portal_dimension")? tags.getInteger("portal_dimension") : -1;
+		super.readFromNBT(tags);
+		
+		this.dimension = tags.getInteger("portal_dimension");
 	}
 	
 	@Override
 	public void writeToNBT(NBTTagCompound tags)
 	{
+		super.writeToNBT(tags);
+		
 		tags.setInteger("portal_dimension", this.dimension);
 	}
 }
