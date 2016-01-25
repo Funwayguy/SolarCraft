@@ -20,6 +20,12 @@ public class TeleportWormhole
 {
 	public static void WarpEntityToDimension(Entity player, int dimension)
 	{
+		if(player.dimension != dimension && dimension == 1)
+		{
+			player.travelToDimension(dimension);
+			return;
+		}
+		
     	if(player instanceof EntityPlayerMP)
     	{
     		WarpPlayerMP((EntityPlayerMP)player, dimension);
@@ -49,6 +55,11 @@ public class TeleportWormhole
                 
                 ChunkCoordinates chunkcoordinates = worldserver1.getSpawnPoint();
                 
+                if(!worldserver1.provider.canRespawnHere() && dimension != 0)
+                {
+                	chunkcoordinates = worldserver1.getEntrancePortalLocation();
+                }
+                
                 chunkcoordinates.posY = worldserver1.getTopSolidOrLiquidBlock(chunkcoordinates.posX, chunkcoordinates.posZ);
                 
                 entity.setLocationAndAngles((double)chunkcoordinates.posX, (double)chunkcoordinates.posY, (double)chunkcoordinates.posZ, entity.rotationYaw, entity.rotationPitch);
@@ -70,7 +81,13 @@ public class TeleportWormhole
 		
 		try
 		{
-			chunkcoordinates = player.mcServer.worldServerForDimension(dimension).getEntrancePortalLocation();
+			WorldServer worldserver = player.mcServer.worldServerForDimension(dimension);
+			chunkcoordinates = worldserver.getSpawnPoint();
+			
+			if(!worldserver.provider.canRespawnHere() && dimension != 0)
+            {
+            	chunkcoordinates = worldserver.getEntrancePortalLocation();
+            }
 		} catch(Exception e)
 		{
 			return;
