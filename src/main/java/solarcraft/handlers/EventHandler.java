@@ -172,7 +172,17 @@ public class EventHandler
 				}
 				
 				Entity entity = (Entity)entry;
-				
+
+				boolean ignoreThisEntity = false;
+
+				for (String entityName : SC_Settings.ignoredEntites) {
+					if (entity.getClass().getName().equals(entityName))
+						ignoreThisEntity = true;
+				}
+
+				if (ignoreThisEntity)
+					continue;
+
 				if(entity.dimension == 0 && !entity.onGround && !(entity.isInWater() || entity.handleLavaMovement()))
 				{
 					entity.motionY = MathHelper.clamp_double(entity.motionY, -3D, 3D); // Make sure entity isn't already too fast for ZeroG
