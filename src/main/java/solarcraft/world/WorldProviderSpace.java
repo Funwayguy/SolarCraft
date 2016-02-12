@@ -130,7 +130,7 @@ public class WorldProviderSpace extends WorldProvider
     @SideOnly(Side.CLIENT)
     public float getCloudHeight()
     {
-        return 1.0F;
+        return SC_Settings.spaceCloudHeight;
     }
 
     /**
@@ -186,7 +186,7 @@ public class WorldProviderSpace extends WorldProvider
      */
     public String getDimensionName()
     {
-        return "Space";
+        return SC_Settings.spaceDimName;
     }
 	
 	/**
