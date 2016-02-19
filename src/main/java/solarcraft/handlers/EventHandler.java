@@ -2,6 +2,7 @@ package solarcraft.handlers;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityFlying;
+import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -176,7 +177,7 @@ public class EventHandler
 				boolean ignoreThisEntity = false;
 
 				for (String entityName : SC_Settings.ignoredEntites) {
-					if (entity.getClass().getName().equals(entityName))
+					if (EntityList.getEntityString(entity).equals(entityName))
 						ignoreThisEntity = true;
 				}
 
