@@ -61,7 +61,6 @@ public class ConfigHandler
 		SC_Settings.spaceSkybox = config.getBoolean("Space Skybox", Configuration.CATEGORY_GENERAL, true, "Replaces the normal overworld skybox with only stars");
 		SC_Settings.generateWormholes = config.getBoolean("Generate Wormholes", Configuration.CATEGORY_GENERAL, true, "Generates natural wormholes in all worlds (fairly rare)");
 		SC_Settings.spaceDimName = config.getString("Space Dimension Name", Configuration.CATEGORY_GENERAL, "Space", "The name for the Space dimension");
-		SC_Settings.spaceCloudHeight = config.getFloat("Cloud Height in Space Dimension", Configuration.CATEGORY_GENERAL, 1.0F, 0.0F, 256.0F, "The y level at which clouds are rendered");
 		SC_Settings.spaceBiomeID = config.getInt("Space Biome ID", Configuration.CATEGORY_GENERAL, 24, 0, BiomeGenBase.getBiomeGenArray().length - 1, "The biome ID used in the scorched area of space");
 		
 		if(!config.hasCategory("Planets"))

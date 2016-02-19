@@ -11,7 +11,6 @@ public class SC_Settings
 	public static boolean debugAir = false;
 	public static boolean badAir = false;
 	public static int spaceBiomeID = 24;
-	public static float spaceCloudHeight = 1.0F;
 	public static String spaceDimName = "Space";
 	public static float asteroidWeight = -35F;
 	public static boolean genGrass = false;
