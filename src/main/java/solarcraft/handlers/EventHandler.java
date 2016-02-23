@@ -55,7 +55,17 @@ public class EventHandler
 	@SubscribeEvent
 	public void onLivingUpdate(LivingUpdateEvent event)
 	{
-		if(event.entityLiving.dimension == 0 && !event.entityLiving.onGround && !(event.entityLiving.isInWater() || event.entityLiving.handleLavaMovement()) && !(event.entityLiving instanceof EntityFlying) && !(event.entityLiving instanceof EntityPlayer && ((EntityPlayer)event.entityLiving).capabilities.isFlying))
+		boolean ignoreThisEntity = false;
+
+		for (String entityName : SC_Settings.ignoredEntites) {
+			if (EntityList.getEntityString(entity).equals(entityName))
+			{
+				ignoreThisEntity = true;
+				break;
+			}
+		}
+
+		if(event.entityLiving.dimension == 0 && !event.entityLiving.onGround && !(event.entityLiving.isInWater() || event.entityLiving.handleLavaMovement()) && !(event.entityLiving instanceof EntityFlying) && !(event.entityLiving instanceof EntityPlayer && ((EntityPlayer)event.entityLiving).capabilities.isFlying) && !ignoreThisEntity)
 		{
 			event.entityLiving.addVelocity(0D, SC_Settings.gravityFact * 0.07D, 0D);
 			
