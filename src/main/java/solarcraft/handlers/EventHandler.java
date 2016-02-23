@@ -57,13 +57,18 @@ public class EventHandler
 	{
 		boolean ignoreThisEntity = false;
 
-		for (String entityName : SC_Settings.ignoredEntites) {
-			if (EntityList.getEntityString(entity).equals(entityName))
-			{
-				ignoreThisEntity = true;
-				break;
-			}
-		}
+		String entitiyString = EntityList.getEntityString(event.entity);
+
+        if (entitiyString != null)
+        {
+            for (String entityName : SC_Settings.ignoredEntites) {
+                if (entitiyString.equals(entityName))
+                {
+                    ignoreThisEntity = true;
+                    break;
+                }
+            }
+        }
 
 		if(event.entityLiving.dimension == 0 && !event.entityLiving.onGround && !(event.entityLiving.isInWater() || event.entityLiving.handleLavaMovement()) && !(event.entityLiving instanceof EntityFlying) && !(event.entityLiving instanceof EntityPlayer && ((EntityPlayer)event.entityLiving).capabilities.isFlying) && !ignoreThisEntity)
 		{
