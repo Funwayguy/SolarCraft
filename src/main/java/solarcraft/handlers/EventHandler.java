@@ -188,7 +188,10 @@ public class EventHandler
 
 				for (String entityName : SC_Settings.ignoredEntites) {
 					if (EntityList.getEntityString(entity).equals(entityName))
+					{
 						ignoreThisEntity = true;
+						break;
+					}
 				}
 
 				if (ignoreThisEntity)
