@@ -190,9 +190,10 @@ public class EventHandler
 				Entity entity = (Entity)entry;
 
 				boolean ignoreThisEntity = false;
+				String entityString = EntityList.getEntityString(entity);
 
 				for (String entityName : SC_Settings.ignoredEntites) {
-					if (EntityList.getEntityString(entity).equals(entityName))
+					if (entityString.equals(entityName))
 					{
 						ignoreThisEntity = true;
 						break;
