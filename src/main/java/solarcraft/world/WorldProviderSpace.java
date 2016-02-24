@@ -186,7 +186,7 @@ public class WorldProviderSpace extends WorldProvider
      */
     public String getDimensionName()
     {
-        return "Space";
+        return SC_Settings.spaceDimName;
     }
 	
 	/**
