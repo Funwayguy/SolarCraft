@@ -2,6 +2,7 @@ package solarcraft.handlers;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityFlying;
+import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -54,7 +55,22 @@ public class EventHandler
 	@SubscribeEvent
 	public void onLivingUpdate(LivingUpdateEvent event)
 	{
-		if(event.entityLiving.dimension == 0 && !event.entityLiving.onGround && !(event.entityLiving.isInWater() || event.entityLiving.handleLavaMovement()) && !(event.entityLiving instanceof EntityFlying) && !(event.entityLiving instanceof EntityPlayer && ((EntityPlayer)event.entityLiving).capabilities.isFlying))
+		boolean ignoreThisEntity = false;
+
+		String entitiyString = EntityList.getEntityString(event.entity);
+
+        if (entitiyString != null)
+        {
+            for (String entityName : SC_Settings.ignoredEntites) {
+                if (entitiyString.equals(entityName))
+                {
+                    ignoreThisEntity = true;
+                    break;
+                }
+            }
+        }
+
+		if(event.entityLiving.dimension == 0 && !event.entityLiving.onGround && !(event.entityLiving.isInWater() || event.entityLiving.handleLavaMovement()) && !(event.entityLiving instanceof EntityFlying) && !(event.entityLiving instanceof EntityPlayer && ((EntityPlayer)event.entityLiving).capabilities.isFlying) && !ignoreThisEntity)
 		{
 			event.entityLiving.addVelocity(0D, SC_Settings.gravityFact * 0.07D, 0D);
 			
@@ -172,7 +188,21 @@ public class EventHandler
 				}
 				
 				Entity entity = (Entity)entry;
-				
+
+				boolean ignoreThisEntity = false;
+				String entityString = EntityList.getEntityString(entity);
+
+				for (String entityName : SC_Settings.ignoredEntites) {
+					if (entityString.equals(entityName))
+					{
+						ignoreThisEntity = true;
+						break;
+					}
+				}
+
+				if (ignoreThisEntity)
+					continue;
+
 				if(entity.dimension == 0 && !entity.onGround && !(entity.isInWater() || entity.handleLavaMovement()))
 				{
 					entity.motionY = MathHelper.clamp_double(entity.motionY, -3D, 3D); // Make sure entity isn't already too fast for ZeroG

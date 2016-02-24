@@ -43,7 +43,12 @@ public class ConfigHandler
 	        "minecraft:stained_hardened_clay:1",
 	        "minecraft:stained_hardened_clay"
 		};
-		
+
+		String[] entityIgnoreDefault = new String[] {
+			"Bat",
+			"Chicken"
+		};
+
 		SC_Settings.asteroidWeight = config.getFloat("Asteroid Weight", Configuration.CATEGORY_GENERAL, -35, -100F, 80F, "Weighted density of asteroids/landmasses");
 		SC_Settings.spawnIsland = config.getFloat("Spawn Size", Configuration.CATEGORY_GENERAL, 24F, 16F, 1024F, "Size of the spawn island (Always created at maximum weight & size)");
 		SC_Settings.genGrass = config.getBoolean("Use Old Biomes", Configuration.CATEGORY_GENERAL, false, "Use the overworlds old biomes instead. Makes for a good 'blown apart world' look");
@@ -61,7 +66,8 @@ public class ConfigHandler
 		SC_Settings.spaceSkybox = config.getBoolean("Space Skybox", Configuration.CATEGORY_GENERAL, true, "Replaces the normal overworld skybox with only stars");
 		SC_Settings.generateWormholes = config.getBoolean("Generate Wormholes", Configuration.CATEGORY_GENERAL, true, "Generates natural wormholes in all worlds (fairly rare)");
 		SC_Settings.spaceBiomeID = config.getInt("Space Biome ID", Configuration.CATEGORY_GENERAL, 24, 0, BiomeGenBase.getBiomeGenArray().length - 1, "The biome ID used in the scorched area of space");
-		
+		SC_Settings.ignoredEntites = config.getStringList("Ignored Entites", Configuration.CATEGORY_GENERAL, entityIgnoreDefault, "Set which Entities should be ignored in gravity processing");
+
 		if(!config.hasCategory("Planets"))
 		{
 			config.getInt("Biome ID", "Planets.default", BiomeGenBase.forest.biomeID, 0, BiomeGenBase.getBiomeGenArray().length - 1, "The planet's biome");

@@ -24,4 +24,5 @@ public class SC_Settings
 	public static float gravityFact = 1F;
 	public static boolean spaceSkybox = true;
 	public static boolean generateWormholes = true;
+	public static String[] ignoredEntites = new String[] {};
 }
